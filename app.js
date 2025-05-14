@@ -2,8 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
-const pgPool = require("./database/pool.js");
 const passport = require("passport");
+
+const { Pool } = require("pg");
 
 require("dotenv").config();
 require("./config/passport.config.js");
@@ -12,7 +13,10 @@ require("./config/passport.config.js");
 const authRouter = require("./routes/authRoutes.js");
 
 const app = express();
-const PORT = process.env.PORT || "3000";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 // Use "public" folder for static files
 app.use(express.static("public"));
@@ -24,7 +28,7 @@ app.use(express.json());
 // Allows for requests from:
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -33,14 +37,19 @@ app.use(
 app.use(
   session({
     store: new pgSession({
-      pool: pgPool,
+      pool: pool,
       tableName: "session",
       createTableIfMissing: false,
     }),
     secret: process.env.COOKIE_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
   })
 );
 
@@ -54,4 +63,4 @@ app.get("/", (req, res) => {
 // Use routes
 app.use("/auth", authRouter);
 
-app.listen(PORT, () => console.log(`Server started on port:`, PORT));
+module.exports = app;
