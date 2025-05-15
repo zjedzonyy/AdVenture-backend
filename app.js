@@ -6,6 +6,14 @@ const passport = require("passport");
 
 const { Pool } = require("pg");
 
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+} = require("./utils/errorUtils");
+
 require("dotenv").config();
 require("./config/passport.config.js");
 
@@ -66,7 +74,7 @@ app.use("/auth", authRouter);
 // Global error handler
 app.use((err, req, res, next) => {
   const status = err.status || 500;
-  res.status(status).json({ message: err.message });
+  res.status(status).json({ name: err.name, message: err.message });
 });
 
 module.exports = app;

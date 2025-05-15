@@ -3,8 +3,6 @@ const LocalStrategy = require("passport-local").Strategy;
 const db = require("../database/queries");
 const bcrypt = require("bcryptjs");
 
-console.log("passport loaded");
-
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
