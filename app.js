@@ -63,4 +63,10 @@ app.get("/", (req, res) => {
 // Use routes
 app.use("/auth", authRouter);
 
+// Global error handler
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  res.status(status).json({ message: err.message });
+});
+
 module.exports = app;
