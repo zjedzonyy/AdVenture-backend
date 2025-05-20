@@ -12,13 +12,13 @@ const {
   ForbiddenError,
   NotFoundError,
   ConflictError,
-} = require("./utils/errorUtils");
+} = require("./utils/error.utils.js");
 
 require("dotenv").config();
 require("./config/passport.config.js");
 
 // Routes
-const authRouter = require("./routes/authRoutes.js");
+const authRouter = require("./routes/auth.route.js");
 
 const app = express();
 

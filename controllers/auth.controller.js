@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const db = require("../database/queries");
-const userService = require("../services/userService");
+const userService = require("../services/user.service");
 
 async function registerUser(req, res, next) {
   try {

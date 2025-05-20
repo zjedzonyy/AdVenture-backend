@@ -1,5 +1,5 @@
 const { body, validationResult } = require("express-validator");
-const { BadRequestError } = require("../utils/errorUtils");
+const { BadRequestError } = require("../utils/error.utils");
 
 const validateUserRegistration = [
   body("username")

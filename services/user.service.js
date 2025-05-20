@@ -4,9 +4,12 @@ const {
   BadRequestError,
   UnauthorizedError,
   ConflictError,
-} = require("../utils/errorUtils");
+} = require("../utils/error.utils");
 
 const register = async ({ username, password, email }) => {
+  if (!username || !password || !email) {
+    throw new BadRequestError("Missing registration fields");
+  }
   // Check username and email uniqueness
   const existingUsername = await db.getUser(username);
   const existingEmail = await db.getUserByEmail(email);
