@@ -1,6 +1,10 @@
 const db = require("../database/queries");
 const bcrypt = require("bcryptjs");
-const { BadRequestError, ConflictError } = require("../utils/error.utils");
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} = require("../utils/error.utils");
 
 const register = async ({ username, password, email }) => {
   if (!username || !password || !email) {

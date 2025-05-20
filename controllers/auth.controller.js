@@ -16,6 +16,11 @@ async function registerUser(req, res, next) {
   }
 }
 
+async function loginUser(req, res) {
+  res.json({ message: "Logged in successfully", user: req.user.username });
+}
+
 module.exports = {
   registerUser,
+  loginUser,
 };

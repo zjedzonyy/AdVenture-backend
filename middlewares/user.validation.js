@@ -34,6 +34,22 @@ const validateUserRegistration = [
   },
 ];
 
+const validateUserLogin = [
+  body("username").notEmpty().withMessage("You forgot to type username"),
+
+  body("password").notEmpty().withMessage("You forgot to type password"),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      throw new BadRequestError(errorMessages.join(", "));
+    }
+    next();
+  },
+];
+
 module.exports = {
   validateUserRegistration,
+  validateUserLogin,
 };

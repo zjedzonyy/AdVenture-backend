@@ -2,15 +2,17 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const db = require("../database/queries");
 const bcrypt = require("bcryptjs");
-
+const { UnauthorizedError } = require("../utils/error.utils");
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       const user = await db.getUser(username);
-      if (!user) return done(null, false, { message: "Incorrect username" });
+      if (!user)
+        return done(new UnauthorizedError("Invalid username or password"));
 
       const match = await bcrypt.compare(password, user.password);
-      if (!match) return done(null, false, { message: "Incorrect password" });
+      if (!match)
+        return done(new UnauthorizedError("Invalid username or password"));
 
       return done(null, user);
     } catch (err) {

@@ -39,6 +39,12 @@ class ConflictError extends HttpError {
   }
 }
 
+class AuthenticateError extends HttpError {
+  constructor(message = "Invalid username or password") {
+    super(410, message);
+  }
+}
+
 module.exports = {
   HttpError,
   BadRequestError,
