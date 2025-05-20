@@ -1,6 +1,5 @@
 const request = require("supertest");
 const app = require("../../app");
-const passport = require("passport");
 const db = require("../../database/queries");
 
 describe("userValidation", () => {

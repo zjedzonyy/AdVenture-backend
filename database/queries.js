@@ -58,7 +58,7 @@ async function getUserByUsername(username) {
 }
 
 async function deleteUserByUsername(username) {
-  const user = await prisma.user.delete({
+  await prisma.user.delete({
     where: {
       username: username,
     },
@@ -66,7 +66,7 @@ async function deleteUserByUsername(username) {
 }
 
 async function deleteUserByEmail(email) {
-  const user = await prisma.user.delete({
+  await prisma.user.delete({
     where: {
       email: email,
     },
