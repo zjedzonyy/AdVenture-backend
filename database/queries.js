@@ -65,6 +65,14 @@ async function deleteUserByUsername(username) {
   });
 }
 
+async function deleteUserByEmail(email) {
+  const user = await prisma.user.delete({
+    where: {
+      email: email,
+    },
+  });
+}
+
 async function createNewChat(id1, id2) {
   const newChat = await prisma.chat.create({
     data: {
@@ -168,4 +176,5 @@ module.exports = {
   getChatMessages,
   getUsersWithCommonChats,
   deleteUserByUsername,
+  deleteUserByEmail,
 };

@@ -87,4 +87,37 @@ describe("userValidation", () => {
     // Remove created user from database
     await db.deleteUserByUsername(uniqueUsername);
   });
+
+  it("should failed with existing username", async () => {
+    // Create user
+    const uniqueUsername = `testUser_${Date.now()}`;
+    await db.createUser(uniqueUsername, "Password1", "valid@gmail.com");
+
+    // Now it should fail
+    const res = await request(app).post("/auth/register").send({
+      username: uniqueUsername,
+      password: "Password1",
+      email: "valid@gmail.com",
+    });
+    expect(res.status).toBe(409);
+    expect(res.body.name).toBe("ConflictError");
+
+    // Clear from database
+    await db.deleteUserByUsername(uniqueUsername);
+  });
+
+  it("should failed with existing email", async () => {
+    const uniqueEmail = `testmail${Date.now()}@gmail.com`;
+    await db.createUser("validUsername11", "Password1", uniqueEmail);
+
+    const res = await request(app).post("/auth/register").send({
+      username: "differentButValid",
+      password: "Password1",
+      email: uniqueEmail,
+    });
+    expect(res.status).toBe(409);
+    expect(res.body.name).toBe("ConflictError");
+
+    await db.deleteUserByEmail(uniqueEmail);
+  });
 });
