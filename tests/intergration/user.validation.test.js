@@ -1,8 +1,15 @@
 const request = require("supertest");
 const app = require("../../app");
 const db = require("../../database/queries");
+const passport = require("passport");
+const bcrypt = require("bcryptjs");
+const { prisma } = require("../../server");
 
 describe("userValidation", () => {
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
   it("should fail if username is invalid", async () => {
     const testCases = [
       {
@@ -118,5 +125,53 @@ describe("userValidation", () => {
     expect(res.body.name).toBe("ConflictError");
 
     await db.deleteUserByEmail(uniqueEmail);
+  });
+
+  // LOGIN TESTS
+  it("should fail with empty username or password", async () => {
+    const testCases = [
+      {
+        username: "",
+        password: "ValidPassword1",
+      },
+      {
+        username: "validuser",
+        password: "",
+      },
+    ];
+    for (const testCase of testCases) {
+      const res = await request(app).post("/auth/login").send({ testCase });
+      expect(res.status).toBe(400);
+      expect(res.body.name).toBe("BadRequestError");
+    }
+  });
+
+  it("should log in with correct data", async () => {
+    // Create user
+    const uniqueUsername = `testUser_${Date.now()}`;
+    const password = "Passport1";
+    const hashedPassword = await bcrypt.hash("Passport1", 10);
+    await db.createUser(uniqueUsername, hashedPassword, "valid@gmail.com");
+
+    // Login
+    const res = await request(app).post("/auth/login").send({
+      username: uniqueUsername,
+      password: password,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe("Logged in successfully");
+    expect(res.body.user).toBe(uniqueUsername);
+
+    // Get the cookie.sid
+    const sidCookie = res.headers["set-cookie"].find((cookie) =>
+      cookie.startsWith("connect.sid")
+    );
+    const match = sidCookie.match(/connect\.sid=s%3A([^.;]+)\./);
+    const sid = match?.[1];
+
+    // Delete user and session
+    await db.deleteUserByUsername(uniqueUsername);
+    await db.deleteSessionBySid(sid);
   });
 });

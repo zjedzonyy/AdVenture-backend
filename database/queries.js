@@ -73,6 +73,14 @@ async function deleteUserByEmail(email) {
   });
 }
 
+async function deleteSessionBySid(sid) {
+  await prisma.session.delete({
+    where: {
+      sid: sid,
+    },
+  });
+}
+
 async function createNewChat(id1, id2) {
   const newChat = await prisma.chat.create({
     data: {
@@ -177,4 +185,5 @@ module.exports = {
   getUsersWithCommonChats,
   deleteUserByUsername,
   deleteUserByEmail,
+  deleteSessionBySid,
 };

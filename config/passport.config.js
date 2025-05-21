@@ -7,12 +7,10 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       const user = await db.getUser(username);
-      if (!user)
-        return done(new UnauthorizedError("Invalid username or password"));
+      if (!user) return done(new UnauthorizedError("Invalid username"));
 
       const match = await bcrypt.compare(password, user.password);
-      if (!match)
-        return done(new UnauthorizedError("Invalid username or password"));
+      if (!match) return done(new UnauthorizedError("Invalid password"));
 
       return done(null, user);
     } catch (err) {
