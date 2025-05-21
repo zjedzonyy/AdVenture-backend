@@ -19,6 +19,7 @@ require("./config/passport.config.js");
 
 // Routes
 const authRouter = require("./routes/auth.route.js");
+const usersRouter = require("./routes/user.route.js");
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.get("/", (req, res) => {
 
 // Use routes
 app.use("/auth", authRouter);
+app.use("/users", usersRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {
