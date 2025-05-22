@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test": "NODE_ENV=test jest",
+    "test:watch": "NODE_ENV=test jest --watchAll"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +16,11 @@
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "dotenv-flow": "^4.1.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
+    "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   },

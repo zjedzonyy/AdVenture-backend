@@ -3,7 +3,7 @@ const cors = require("cors");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const passport = require("passport");
-
+const morgan = require("morgan");
 const { Pool } = require("pg");
 
 const {
@@ -14,7 +14,7 @@ const {
   ConflictError,
 } = require("./utils/error.utils.js");
 
-require("dotenv").config();
+require("dotenv-flow").config();
 require("./config/passport.config.js");
 
 // Routes
@@ -34,12 +34,17 @@ app.use(express.urlencoded({ extended: true }));
 // Allows reading JSON from requests
 app.use(express.json());
 
+// Logging middleware
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
+
 // Allows for requests from:
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
 
 // Configurate sessions
@@ -59,7 +64,7 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
-  })
+  }),
 );
 
 app.use(passport.initialize());

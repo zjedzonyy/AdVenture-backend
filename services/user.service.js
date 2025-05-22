@@ -19,7 +19,7 @@ const register = async ({ username, password, email }) => {
   }
   if (existingEmail) {
     throw new ConflictError(
-      "There is already an account associated with this email."
+      "There is already an account associated with this email.",
     );
   }
 
