@@ -1,11 +1,10 @@
 const request = require("supertest");
 const app = require("../../app");
 const db = require("../../database/queries");
-const passport = require("passport");
 const bcrypt = require("bcryptjs");
 const { prisma } = require("../../server");
 
-describe("userValidation", () => {
+describe("auth.route.js", () => {
   afterAll(async () => {
     await prisma.$disconnect();
   });
@@ -165,7 +164,7 @@ describe("userValidation", () => {
 
     // Get the cookie.sid
     const sidCookie = res.headers["set-cookie"].find((cookie) =>
-      cookie.startsWith("connect.sid")
+      cookie.startsWith("connect.sid"),
     );
     const match = sidCookie.match(/connect\.sid=s%3A([^.;]+)\./);
     const sid = match?.[1];

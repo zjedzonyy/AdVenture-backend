@@ -16,7 +16,7 @@ passport.use(
     } catch (err) {
       return done(err);
     }
-  })
+  }),
 );
 
 // Send user.id on successfull login

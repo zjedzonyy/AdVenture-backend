@@ -8,14 +8,14 @@ const router = express.Router();
 router.post(
   "/register",
   userValidation.validateUserRegistration,
-  authController.registerUser
+  authController.registerUser,
 );
 
 router.post(
   "/login",
   userValidation.validateUserLogin,
   passport.authenticate("local"),
-  authController.loginUser
+  authController.loginUser,
 );
 
 module.exports = router;

@@ -1,9 +1,10 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "eslint.workingDirectories": ["./"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": null,
   "eslint.validate": ["javascript"],
-  "eslint.options": {
-    "ignorePattern": ["tests/**/*"]
-  }
+  "eslint.useFlatConfig": true,
+  "eslint.run": "onType"
 }
