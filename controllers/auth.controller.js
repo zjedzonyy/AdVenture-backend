@@ -20,7 +20,21 @@ async function loginUser(req, res) {
   res.json({ message: "Logged in successfully", user: req.user.username });
 }
 
+function logout(req, res, next) {
+  req.logout((err) => {
+    if (err) return next(err);
+
+    req.session.destroy((err) => {
+      if (err) return next(err);
+
+      res.clearCookie("connect.sid");
+      res.status(200).json({ message: "Logged out successfully" });
+    });
+  });
+}
+
 module.exports = {
   registerUser,
   loginUser,
+  logout,
 };

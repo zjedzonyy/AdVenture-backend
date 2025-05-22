@@ -35,13 +35,10 @@ describe("User Profile Endpoint", () => {
   afterAll(async () => {
     // Delete test user and it's session
     await db.deleteUserByUsername(testUser.username);
-    const sidCookie = authCookie.find((cookie) =>
-      cookie.startsWith("connect.sid"),
-    );
-    const match = sidCookie.match(/connect\.sid=s%3A([^.;]+)\./);
-    const sid = match?.[1];
-
-    await db.deleteSessionBySid(sid);
+    await request(app)
+      .post("/auth/logout")
+      .set("Cookie", authCookie)
+      .expect(200);
   });
 
   it("should return 401 when user is not authenticated", async () => {

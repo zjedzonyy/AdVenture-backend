@@ -3,6 +3,7 @@ const app = require("../../app");
 const db = require("../../database/queries");
 const bcrypt = require("bcryptjs");
 const { prisma } = require("../../server");
+const { removeSession } = require("../utils/helper");
 
 describe("auth.route.js", () => {
   afterAll(async () => {
@@ -162,15 +163,8 @@ describe("auth.route.js", () => {
     expect(res.body.message).toBe("Logged in successfully");
     expect(res.body.user).toBe(uniqueUsername);
 
-    // Get the cookie.sid
-    const sidCookie = res.headers["set-cookie"].find((cookie) =>
-      cookie.startsWith("connect.sid"),
-    );
-    const match = sidCookie.match(/connect\.sid=s%3A([^.;]+)\./);
-    const sid = match?.[1];
-
     // Delete user and session
     await db.deleteUserByUsername(uniqueUsername);
-    await db.deleteSessionBySid(sid);
+    await removeSession(res);
   });
 });
