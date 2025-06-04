@@ -82,13 +82,17 @@ describe("auth.route.js", () => {
 
   it("should pass with valid data", async () => {
     const uniqueUsername = `testuser_${Date.now()}`;
-    const res = await request(app).post("/auth/register").send({
-      username: uniqueUsername,
-      password: "ValidPassword1",
-      email: "valid@gmail.com",
-    });
+    const res = await request(app)
+      .post("/auth/register")
+      .send({
+        username: uniqueUsername,
+        password: "ValidPassword1",
+        email: `valid_${Date.now()}@gmail.com`,
+      });
     expect(res.status).toBe(201);
-    expect(res.body).toBe("User created successfully!");
+    expect(res.body.message).toBe(
+      "User registered and logged in successfully!",
+    );
 
     // Remove created user from database
     await db.deleteUserByUsername(uniqueUsername);

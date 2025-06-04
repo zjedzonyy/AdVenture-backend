@@ -15,11 +15,12 @@ const register = async ({ username, password, email }) => {
   const existingEmail = await db.getUserByEmail(email);
 
   if (existingUsername) {
-    throw new ConflictError("This username already exists.");
+    throw new ConflictError("This username already exists.", "username");
   }
   if (existingEmail) {
     throw new ConflictError(
       "There is already an account associated with this email.",
+      "email",
     );
   }
 

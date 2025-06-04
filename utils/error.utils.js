@@ -1,7 +1,7 @@
 // Base HTTP error class that extends the built-in Error object.
 // Adds HTTP status code and captures stack trace for better debugging.
 class HttpError extends Error {
-  constructor(status, message) {
+  constructor(status, message, field = null) {
     super(message);
     this.status = status;
     this.name = this.constructor.name;
@@ -34,8 +34,9 @@ class NotFoundError extends HttpError {
 }
 
 class ConflictError extends HttpError {
-  constructor(message = "Data conflict") {
+  constructor(message = "Data conflict", field = null) {
     super(409, message);
+    this.field = field;
   }
 }
 

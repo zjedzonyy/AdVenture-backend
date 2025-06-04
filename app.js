@@ -80,8 +80,17 @@ app.use("/users", usersRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {
+  console.error("X Error: ", err.stack);
   const status = err.status || 500;
-  res.status(status).json({ name: err.name, message: err.message });
+  console.log(err.field);
+  const response = {
+    name: err.name,
+    message: err.message,
+  };
+  if (err.field) {
+    response.field = err.field;
+  }
+  res.status(status).json(response);
 });
 
 module.exports = app;

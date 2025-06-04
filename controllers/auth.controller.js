@@ -1,16 +1,26 @@
-const bcrypt = require("bcryptjs");
-const db = require("../database/queries");
+// const bcrypt = require("bcryptjs");
+// const db = require("../database/queries");
 const userService = require("../services/user.service");
 
 async function registerUser(req, res, next) {
   try {
     const { username, password, email } = req.body;
-
     const newUser = await userService.register({ username, password, email });
 
-    // Add automatic login?
-
-    res.status(201).json("User created successfully!");
+    if (process.env.NODE_ENV !== "test") {
+      req.login({ id: newUser }, (err) => {
+        if (err) return next(err);
+        res.status(201).json({
+          message: "User registered and logged in successfully!",
+          user: newUser.username,
+        });
+      });
+    } else {
+      res.status(201).json({
+        message: "User registered and logged in successfully!",
+        user: newUser.username,
+      });
+    }
   } catch (error) {
     next(error);
   }
