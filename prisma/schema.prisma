@@ -13,7 +13,7 @@ model User {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
-  profileViewCount Int
+  profileViewCount Int @default(0)
   ideas Idea[]
   comments Comment[]
   reviews Review[]
@@ -34,19 +34,17 @@ model Idea {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isActive Boolean
-  viewCount Int
-  averageRating Float
-  completionCount Int
-  isChallenge Boolean
+  viewCount Int @default(0)
+  averageRating Float @default(0)
+  completionCount Int @default(0)
+  isChallenge Boolean 
 
 
   duration Duration? @relation(fields: [durationId], references: [id])
   durationId Int?
 
-
-  categories Category[]
-
-  groupSize GroupSize[]
+  categoryLinks   CategoryToIdea[]
+  groupSizeLinks  GroupSizeToIdea[]
 
   priceRange PriceRange @relation(fields: [priceRangeId], references: [id])
   priceRangeId Int
@@ -61,6 +59,27 @@ model Idea {
 
   @@map("idea")
 }
+
+model CategoryToIdea {
+  idea       Idea     @relation(fields: [ideaId], references: [id])
+  ideaId     Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  @@id([ideaId, categoryId])
+  @@map("category_to_idea")
+}
+
+model GroupSizeToIdea {
+  idea        Idea      @relation(fields: [ideaId], references: [id])
+  ideaId      Int
+  groupSize   GroupSize @relation(fields: [groupSizeId], references: [id])
+  groupSizeId Int
+
+  @@id([ideaId, groupSizeId])
+  @@map("group_size_to_idea")
+}
+
 
 model UserFollow {
   id Int @id @default(autoincrement())
@@ -131,24 +150,27 @@ model Comment {
 model PriceRange {
   id   Int    @id @default(autoincrement())
   label String @unique 
+  min Int // Euro
+  max Int?  // null for open ranges
   ideas Idea[]
 
   @@map("price_range")
 }
 
 model GroupSize {
-  id Int @id @default(autoincrement())
-  label String @unique
-  ideas Idea[]
+  id         Int               @id @default(autoincrement())
+  label      String            @unique
+  min        Int
+  max        Int?
+  ideaLinks  GroupSizeToIdea[]
 
   @@map("group_size")
 }
 
 model Category {
-  id Int @id @default(autoincrement())
-  label String @unique
-  ideas Idea[]
-
+  id        Int              @id @default(autoincrement())
+  label     String           @unique
+  ideaLinks CategoryToIdea[]
 
   @@map("category")
 }
@@ -156,6 +178,8 @@ model Category {
 model Duration {
   id Int @id @default(autoincrement())
   label String @unique
+  min Int // minutes
+  max Int? // null for open ranges
   ideas Idea[]
 
   @@map("duration")
