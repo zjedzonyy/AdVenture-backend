@@ -1,4 +1,5 @@
 node_modules
 .env
 todo.txt
-.env.test.env.prod
+.env.test
+.env.prod
