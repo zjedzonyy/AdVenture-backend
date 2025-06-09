@@ -32,24 +32,25 @@ const register = async ({ username, password, email }) => {
   return newUser;
 };
 
-const getUserProfile = async (requestingUserId, targetUsername) => {
-  const targetUser = await db.getUserByUsername(targetUsername);
+const getUserProfile = async (requestingUserId, targetId) => {
+  console.log(targetId);
+  const targetUser = await db.getUserById(targetId);
   if (!targetUser) {
     throw new NotFoundError("User not found");
   }
 
   // If it is my own profile
-  if (requestingUserId === targetUser.id) {
-    return await db.getUserPrivateData(targetUser.id);
+  if (requestingUserId === targetId) {
+    return await db.getUserPrivateData(targetId);
   }
 
   // If that is someone I follow
-  const isFollowing = await db.isFollowing(requestingUserId, targetUser.id);
+  const isFollowing = await db.isFollowing(requestingUserId, targetId);
 
   if (isFollowing) {
-    return await db.getUserPublicData(targetUser.id);
+    return await db.getUserPublicData(targetId);
   } else {
-    return await db.getUserBasicData(targetUser.id);
+    return await db.getUserBasicData(targetId);
   }
 };
 

@@ -5,11 +5,11 @@ const userService = require("../services/user.service");
 const getUserProfile = async (req, res, next) => {
   try {
     const requestingUserId = req.user.id;
-    const targetUsername = req.params.username;
+    const targetId = req.params.id;
 
     const userData = await userService.getUserProfile(
       requestingUserId,
-      targetUsername,
+      targetId,
     );
 
     res.status(200).json({

@@ -87,8 +87,10 @@ async function getUserBasicData(id) {
 async function isFollowing(followerId, followingId) {
   const user = await prisma.userFollow.findUnique({
     where: {
-      followerId: followerId,
-      followingId: followingId,
+      followerId_followingId: {
+        followerId,
+        followingId,
+      },
     },
   });
 
