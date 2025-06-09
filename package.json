@@ -4,7 +4,14 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test jest",
-    "test:watch": "NODE_ENV=test jest --watchAll"
+    "test:watch": "NODE_ENV=test jest --watchAll",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy", 
+    "migrate:prod": "dotenv -e .env.prod -- npx prisma migrate deploy",
+    "db:reset:dev": "dotenv -e .env -- npx prisma migrate reset",
+    "db:reset:test": "dotenv -e .env.test -- npx prisma migrate reset",
+    "db:reset:prod": "dotenv -e .env.prod -- npx prisma migrate reset",
+    "seed:test": "dotenv -e .env.test -- node database/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",

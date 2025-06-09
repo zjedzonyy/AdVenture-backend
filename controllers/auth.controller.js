@@ -38,7 +38,9 @@ function logout(req, res, next) {
       if (err) return next(err);
 
       res.clearCookie("connect.sid");
-      res.status(200).json({ message: "Logged out successfully" });
+      res
+        .status(200)
+        .json({ success: true, message: "Logged out successfully" });
     });
   });
 }
