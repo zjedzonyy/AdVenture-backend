@@ -22,6 +22,79 @@ async function getUser(username) {
   return user;
 }
 
+async function getUserPrivateData(id) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      createdAt: true,
+      profileViewCount: true,
+      ideas: true,
+      comments: true,
+      reviews: true,
+      follower: true,
+      following: true,
+      ideaStatus: true,
+      role: true,
+    },
+  });
+
+  return user;
+}
+
+async function getUserPublicData(id) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      username: true,
+      createdAt: true,
+      profileViewCount: true,
+      ideas: true,
+      comments: true,
+      follower: true,
+      following: true,
+      ideaStatus: true,
+      role: true,
+    },
+  });
+
+  return user;
+}
+
+async function getUserBasicData(id) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      username: true,
+      createdAt: true,
+      profileViewCount: true,
+      follower: true,
+      following: true,
+    },
+  });
+
+  return user;
+}
+
+async function isFollowing(followerId, followingId) {
+  const user = await prisma.userFollow.findUnique({
+    where: {
+      followerId: followerId,
+      followingId: followingId,
+    },
+  });
+
+  return user;
+}
+
 async function getUserByEmail(email) {
   const user = await prisma.user.findUnique({
     where: {
@@ -188,4 +261,8 @@ module.exports = {
   deleteUserByUsername,
   deleteUserByEmail,
   deleteSessionBySid,
+  getUserPrivateData,
+  isFollowing,
+  getUserPublicData,
+  getUserBasicData,
 };

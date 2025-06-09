@@ -12,6 +12,7 @@ model User {
   email     String   @unique
   username  String   @unique
   password  String
+  isPrivate Boolean @default(false)
   createdAt DateTime @default(now())
   profileViewCount Int @default(0)
   ideas Idea[]
@@ -19,10 +20,32 @@ model User {
   reviews Review[]
   follower UserFollow[] @relation("Followings")
   following UserFollow[] @relation("Followers")
+  fromUser FollowRequest[] @relation("SentRequests")
+  toUser FollowRequest[] @relation("ReceivedRequests")
   ideaStatus UserIdeaStatus[]
   role      Role     @default(USER)
 
   @@map("user")
+}
+
+model FollowRequest {
+  id Int @id @default(autoincrement())
+  fromUser User @relation("SentRequests", fields: [fromUserId], references: [id])
+  fromUserId String
+
+  toUser User @relation("ReceivedRequests", fields: [toUserId], references: [id])
+  toUserId String
+  status RequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+  @@map("follow_request")
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model Idea {

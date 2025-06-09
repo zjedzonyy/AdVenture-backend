@@ -22,7 +22,6 @@ const authRouter = require("./routes/auth.route.js");
 const usersRouter = require("./routes/user.route.js");
 
 const app = express();
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -80,9 +79,9 @@ app.use("/users", usersRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error("X Error: ", err.stack);
+  // Temp turn off (till improving tests)
+  // console.error("X Error: ", err.stack);
   const status = err.status || 500;
-  console.log(err.field);
   const response = {
     name: err.name,
     message: err.message,
@@ -90,6 +89,7 @@ app.use((err, req, res, next) => {
   if (err.field) {
     response.field = err.field;
   }
+  // console.log(err.field)
   res.status(status).json(response);
 });
 

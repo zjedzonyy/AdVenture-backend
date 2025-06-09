@@ -54,6 +54,8 @@ describe("User Profile Endpoint", () => {
     expect(res.body.success).toBe(true);
     expect(res.body.data).toHaveProperty("username", testUser.username);
     expect(res.body.data).toHaveProperty("email", testUser.email);
+    expect(res.body.data.ideas).toBeInstanceOf(Array);
+
     expect(res.body.data).not.toHaveProperty("password"); // Ensure password is not returned!!
   });
 

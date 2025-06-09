@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start:server:dev": "dotenv -e .env -- node --watch server.js",
+    "start:server:test": "dotenv -e .env.test -- node --watch server.js",
     "test": "NODE_ENV=test jest",
     "test:watch": "NODE_ENV=test jest --watchAll",
     "migrate:dev": "npx prisma migrate dev",
@@ -11,7 +13,8 @@
     "db:reset:dev": "dotenv -e .env -- npx prisma migrate reset",
     "db:reset:test": "dotenv -e .env.test -- npx prisma migrate reset",
     "db:reset:prod": "dotenv -e .env.prod -- npx prisma migrate reset",
-    "seed:test": "dotenv -e .env.test -- node database/seed.js"
+    "seed:test": "dotenv -e .env.test -- node database/seed.js",
+    "seed:dev": "dotenv -e .env -- node database/seed.js"
   },
   "keywords": [],
   "author": "",
