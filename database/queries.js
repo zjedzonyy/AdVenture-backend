@@ -248,6 +248,19 @@ async function getUsersWithCommonChats(username) {
   }));
 }
 
+async function getAllIdeas(where, orderBy, skip, limit) {
+  const ideas = await prisma.idea.findMany({
+    where,
+    orderBy,
+    skip: skip,
+    take: limit,
+  });
+
+  const totalCount = await prisma.idea.count({ where });
+
+  return [ideas, totalCount];
+}
+
 module.exports = {
   createUser,
   getUser,
@@ -267,4 +280,5 @@ module.exports = {
   isFollowing,
   getUserPublicData,
   getUserBasicData,
+  getAllIdeas,
 };

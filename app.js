@@ -20,6 +20,7 @@ require("./config/passport.config.js");
 // Routes
 const authRouter = require("./routes/auth.route.js");
 const usersRouter = require("./routes/user.route.js");
+const ideasRouter = require("./routes/ideas.route.js");
 
 const app = express();
 const pool = new Pool({
@@ -76,6 +77,7 @@ app.get("/", (req, res) => {
 // Use routes
 app.use("/auth", authRouter);
 app.use("/users", usersRouter);
+app.use("/ideas", ideasRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {

@@ -3,3 +3,5 @@ node_modules
 todo.txt
 .env.test
 .env.prod
+
+/database/seedHigh.js

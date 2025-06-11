@@ -11,7 +11,7 @@ describe("register", () => {
         username: "existinguser",
         password: "Password1",
         email: "email@example.com",
-      })
+      }),
     ).rejects.toThrow("This username already exists.");
   });
   it("should throw ConflictError if email already exists", async () => {
@@ -22,9 +22,9 @@ describe("register", () => {
         username: "newuser",
         password: "Password1",
         email: "exstinig@gmail.com",
-      })
+      }),
     ).rejects.toThrow(
-      "There is already an account associated with this email."
+      "There is already an account associated with this email.",
     );
   });
   it("should create a new user if username and email are unique", async () => {
@@ -43,7 +43,7 @@ describe("register", () => {
     expect(db.createUser).toHaveBeenCalledWith(
       "newuser",
       expect.any(String), // hashed password
-      "new@gmail.com"
+      "new@gmail.com",
     );
     expect(result).toEqual({ id: 1, username: "newuser" });
   });

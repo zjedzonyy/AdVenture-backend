@@ -3,6 +3,7 @@ const app = require("../../app");
 const db = require("../../database/queries");
 // const passport = require("passport");
 const bcrypt = require("bcryptjs");
+const { createTestScheduler } = require("jest");
 
 describe("User Profile Endpoint", () => {
   // Test user
@@ -13,14 +14,15 @@ describe("User Profile Endpoint", () => {
   };
 
   let authCookie;
-
+  let testUserId;
   // Create a test user and get auth cookie
   beforeAll(async () => {
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
 
     // Create account in db
     await db.createUser(testUser.username, hashedPassword, testUser.email);
-
+    testUserId = await db.getUser(testUser.username);
+    testUserId = testUserId.id;
     // Login and auth cookie
     const response = await request(app).post("/auth/login").send({
       username: testUser.username,
@@ -42,13 +44,15 @@ describe("User Profile Endpoint", () => {
   });
 
   it("should return 401 when user is not authenticated", async () => {
-    const res = await request(app).get("/users/me");
+    const res = await request(app).get(`/users/${testUserId}`);
     expect(res.status).toBe(401);
     expect(res.body.name).toBe("UnauthorizedError");
   });
 
   it("should return user profile when authenticated", async () => {
-    const res = await request(app).get("/users/me").set("Cookie", authCookie);
+    const res = await request(app)
+      .get(`/users/${testUserId}`)
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

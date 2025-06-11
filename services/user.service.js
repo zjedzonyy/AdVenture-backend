@@ -33,7 +33,6 @@ const register = async ({ username, password, email }) => {
 };
 
 const getUserProfile = async (requestingUserId, targetId) => {
-  console.log(targetId);
   const targetUser = await db.getUserById(targetId);
   if (!targetUser) {
     throw new NotFoundError("User not found");
