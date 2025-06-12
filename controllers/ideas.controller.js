@@ -30,7 +30,22 @@ const getIdea = async (req, res, next) => {
   }
 };
 
+const getIdeaComments = async (req, res, next) => {
+  try {
+    const filters = req.query;
+    const ideaId = req.params.id;
+    const comments = await ideasService.getIdeaComments(ideaId, filters);
+
+    res.status(200).json({
+      success: true,
+      data: comments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   getAllIdeas,
   getIdea,
+  getIdeaComments,
 };

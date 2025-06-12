@@ -10,7 +10,7 @@ const { idea } = require("../database/prisma");
 
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
 router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
-router.get("/:id/comments", requireAuth); // Get all comments for this Idea
+router.get("/:id/comments", requireAuth, ideasController.getIdeaComments); // Get all comments for this Idea
 router.get("/:id/reviews", requireAuth); // Get all reviews for this Idea
 // router.get("/filter", requireAuth); // Search based on filters
 router.get("/lucky-luke", requireAuth); // Get random idea

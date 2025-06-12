@@ -108,7 +108,54 @@ async function getIdea(ideaId, requestingUserId = null) {
   };
 }
 
+// If to slow -> add Index on comments.ideaId
+async function getIdeaComments(ideaId, skip, limit) {
+  const comments = await prisma.comment.findMany({
+    where: {
+      ideaId: ideaId,
+    },
+    select: {
+      id: true,
+      author: {
+        select: {
+          username: true,
+          createdAt: true,
+          _count: {
+            select: {
+              follower: true,
+              following: true,
+            },
+          },
+        },
+      },
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    skip: skip,
+    take: limit,
+  });
+  const totalCount = await prisma.comment.count({
+    where: { ideaId: ideaId },
+  });
+
+  return {
+    comments: comments.map(({ author, ...rest }) => ({
+      ...rest,
+      author: {
+        ...author,
+        followerCount: author._count.follower,
+        followingCount: author._count.following,
+        _count: undefined,
+      },
+    })),
+    totalCount,
+  };
+}
+
 module.exports = {
   getIdea,
   getAllIdeas,
+  getIdeaComments,
 };
