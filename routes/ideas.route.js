@@ -8,8 +8,10 @@ const { idea } = require("../database/prisma");
 // Update averageRating
 // Count completionCount
 
-router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (with filters from query req.query)
-router.get("/:id", requireAuth); // Get single idea
+router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
+router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
+router.get("/:id/comments", requireAuth); // Get all comments for this Idea
+router.get("/:id/reviews", requireAuth); // Get all reviews for this Idea
 // router.get("/filter", requireAuth); // Search based on filters
 router.get("/lucky-luke", requireAuth); // Get random idea
 router.get("/popular", requireAuth); // Get most popular Ideas
@@ -22,6 +24,6 @@ router.delete("/:id", requireAuth); // Delete own idea
 router.patch("/:id/activate", requireAuth); // Toggle isActive
 
 router.post("/:id/like", requireAuth); // Add to favorite
-router.delete("/:id/lke", requireAuth); // Remove from favorites
+router.delete("/:id/like", requireAuth); // Remove from favorites
 
 module.exports = router;
