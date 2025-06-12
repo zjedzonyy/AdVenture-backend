@@ -1,5 +1,4 @@
 // controllers/user.controllers.js
-const { request } = require("../app");
 const userService = require("../services/user.service");
 
 const getUserProfile = async (req, res, next) => {

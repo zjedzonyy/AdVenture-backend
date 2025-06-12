@@ -1,6 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const db = require("../database/queries");
+const db = require("../database/queries/index");
 const bcrypt = require("bcryptjs");
 const { UnauthorizedError } = require("../utils/error.utils");
 passport.use(

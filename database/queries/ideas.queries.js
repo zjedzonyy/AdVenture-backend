@@ -1,4 +1,4 @@
-const prisma = require("./prisma");
+const prisma = require("../prisma");
 
 async function getAllIdeas(where, orderBy, skip, limit) {
   const ideas = await prisma.idea.findMany({

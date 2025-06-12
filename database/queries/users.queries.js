@@ -1,4 +1,4 @@
-const prisma = require("./prisma");
+const prisma = require("../prisma");
 
 async function createUser(username, hashedPassword, email) {
   const newUser = await prisma.user.create({

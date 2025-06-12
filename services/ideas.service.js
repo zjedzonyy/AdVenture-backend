@@ -1,5 +1,4 @@
-const db = require("../database/queries");
-const queriesIdeas = require("../database/ideas.queries");
+const db = require("../database/queries/index");
 const bcrypt = require("bcryptjs");
 const {
   BadRequestError,
@@ -276,19 +275,14 @@ const getAllIdeas = async (filters, requestingUserId) => {
 
   // Use /ideas?limit=0 to fetch all records at once
   if (filters.limit === "0") {
-    const [ideas, totalCount] = await queriesIdeas.getAllIdeas(where, orderBy);
+    const [ideas, totalCount] = await db.getAllIdeas(where, orderBy);
     return {
       ideas,
       totalCount,
     };
   }
 
-  const [ideas, totalCount] = await queriesIdeas.getAllIdeas(
-    where,
-    orderBy,
-    skip,
-    limit,
-  );
+  const [ideas, totalCount] = await db.getAllIdeas(where, orderBy, skip, limit);
 
   const totalPages = Math.ceil(totalCount / limit);
   return {
@@ -305,7 +299,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
 };
 
 const getIdea = async (ideaId, requestingUserId) => {
-  const idea = await queriesIdeas.getIdea(Number(ideaId), requestingUserId);
+  const idea = await db.getIdea(Number(ideaId), requestingUserId);
   if (!idea) {
     throw new NotFoundError("Couldn't find requested idea");
   }
