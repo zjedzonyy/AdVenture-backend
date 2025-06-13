@@ -120,6 +120,14 @@ async function getIdeaComments(ideaId, skip, limit) {
         select: {
           username: true,
           createdAt: true,
+          reviews: {
+            where: {
+              ideaId: ideaId,
+            },
+            select: {
+              rating: true,
+            },
+          },
           _count: {
             select: {
               follower: true,
@@ -136,6 +144,7 @@ async function getIdeaComments(ideaId, skip, limit) {
     skip: skip,
     take: limit,
   });
+
   const totalCount = await prisma.comment.count({
     where: { ideaId: ideaId },
   });
@@ -147,15 +156,25 @@ async function getIdeaComments(ideaId, skip, limit) {
         ...author,
         followerCount: author._count.follower,
         followingCount: author._count.following,
+        userIdeaRating: author.reviews[0].rating,
         _count: undefined,
+        reviews: undefined,
       },
     })),
     totalCount,
   };
 }
 
+async function incrementIdeaViewCount(ideaId) {
+  return prisma.idea.update({
+    where: { id: ideaId },
+    data: { viewCount: { increment: 1 } },
+  });
+}
+
 module.exports = {
   getIdea,
   getAllIdeas,
   getIdeaComments,
+  incrementIdeaViewCount,
 };

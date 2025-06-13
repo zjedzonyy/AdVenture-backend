@@ -44,6 +44,7 @@ const getIdeaComments = async (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = {
   getAllIdeas,
   getIdea,

@@ -297,47 +297,58 @@ const getAllIdeas = async (filters, requestingUserId) => {
   };
 };
 
+// Get idea and then increment viewCount
 const getIdea = async (ideaId, requestingUserId) => {
-  const idea = await db.getIdea(Number(ideaId), requestingUserId);
-  if (!idea) {
-    throw new NotFoundError("Couldn't find requested idea");
-  }
+  try {
+    const idea = await db.getIdea(Number(ideaId), requestingUserId);
+    if (!idea) {
+      throw new NotFoundError("Couldn't find requested idea");
+    }
 
-  return idea;
+    await db.incrementIdeaViewCount(Number(ideaId));
+
+    return idea;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getIdeaComments = async (ideaId, filters) => {
-  const page = Math.max(1, parseInt(filters.page || 1));
-  const limit = Math.min(10, Math.max(1, parseInt(filters.limit)) || 10);
-  const skip = (page - 1) * limit;
+  try {
+    const page = Math.max(1, parseInt(filters.page || 1));
+    const limit = Math.min(10, Math.max(1, parseInt(filters.limit)) || 10);
+    const skip = (page - 1) * limit;
 
-  if (filters.limit === "0") {
-    const { comments, totalCount } = await db.getIdeaComments(Number(ideaId));
-    return { comments, totalCount };
+    if (filters.limit === "0") {
+      const { comments, totalCount } = await db.getIdeaComments(Number(ideaId));
+      return { comments, totalCount };
+    }
+    const { comments, totalCount } = await db.getIdeaComments(
+      Number(ideaId),
+      skip,
+      limit,
+    );
+
+    if (!comments) {
+      throw new NotFoundError("Couldn't find requested comments for this Idea");
+    }
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      comments,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error(error);
   }
-  const { comments, totalCount } = await db.getIdeaComments(
-    Number(ideaId),
-    skip,
-    limit,
-  );
-
-  if (!comments) {
-    throw new NotFoundError("Couldn't find requested comments for this Idea");
-  }
-
-  const totalPages = Math.ceil(totalCount / limit);
-
-  return {
-    comments,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalItems: totalCount,
-      itemsPerPage: limit,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1,
-    },
-  };
 };
 
 module.exports = {

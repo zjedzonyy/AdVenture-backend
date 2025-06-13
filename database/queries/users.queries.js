@@ -1,11 +1,12 @@
 const prisma = require("../prisma");
 
-async function createUser(username, hashedPassword, email) {
+async function createUser(username, hashedPassword, email, role = "USER") {
   const newUser = await prisma.user.create({
     data: {
       username: username,
       password: hashedPassword,
       email: email,
+      role: role,
     },
   });
 
@@ -142,6 +143,14 @@ async function deleteUserByUsername(username) {
   });
 }
 
+async function deleteUserById(id) {
+  await prisma.user.delete({
+    where: {
+      id,
+    },
+  });
+}
+
 async function deleteUserByEmail(email) {
   await prisma.user.delete({
     where: {
@@ -267,4 +276,5 @@ module.exports = {
   isFollowing,
   getUserPublicData,
   getUserBasicData,
+  deleteUserById,
 };
