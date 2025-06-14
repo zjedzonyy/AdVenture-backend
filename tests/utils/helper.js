@@ -59,8 +59,34 @@ const deleteUser = async (id) => {
   await db.deleteUserById(id);
 };
 
+const deleteIdea = async (ideaId) => {
+  await db.deleteIdea(ideaId);
+};
+
+// Create Idea and return its id
+const createIdea = async (authorId) => {
+  const ideaData = {
+    authorId,
+    title: `Its just a testing title_${Date.now()}`,
+    description: "It's just a testing description.",
+    isActive: true,
+    isChallenge: false,
+    durationId: 1,
+    priceRangeId: 1,
+    locationType: "INDOOR",
+    categories: [2, 5],
+    groups: [1, 2],
+  };
+
+  const ideaId = await db.createIdea(ideaData);
+
+  return ideaId;
+};
+
 module.exports = {
   removeSession,
   createUser,
   deleteUser,
+  createIdea,
+  deleteIdea,
 };

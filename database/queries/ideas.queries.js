@@ -172,9 +172,53 @@ async function incrementIdeaViewCount(ideaId) {
   });
 }
 
+async function createIdea(
+  title,
+  description,
+  isActive,
+  isChallenge,
+  durationId,
+  categories,
+  groups,
+  priceRangeId,
+  locationType,
+  authorId,
+) {
+  const idea = await prisma.idea.create({
+    data: {
+      authorId,
+      title,
+      description,
+      isActive,
+      isChallenge,
+      durationId,
+      priceRangeId,
+      locationType,
+      categoryLinks: {
+        create: categories.map((categoryId) => ({
+          categoryId: categoryId,
+        })),
+      },
+      groupSizeLinks: {
+        create: groups.map((groupSizeId) => ({
+          groupSizeId: groupSizeId,
+        })),
+      },
+    },
+  });
+
+  return idea.id;
+}
+
+const deleteIdea = async (ideaId) => {
+  await prisma.idea.delete({ where: { id: ideaId } });
+};
+
 module.exports = {
   getIdea,
   getAllIdeas,
   getIdeaComments,
   incrementIdeaViewCount,
+  createIdea,
+  deleteIdea,
 };

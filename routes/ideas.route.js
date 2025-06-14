@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ideasController = require("../controllers/ideas.controller");
 const { requireAuth } = require("../middlewares/auth.middleware");
+const ideasValidation = require("../middlewares/ideas.validation");
 const { idea } = require("../database/prisma");
 
 // Add viewCount every time someone fetch Idea
@@ -9,14 +10,19 @@ const { idea } = require("../database/prisma");
 // Count completionCount
 
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
+router.get("/lucky", ideasController.getRandomIdea); // Get random idea
 router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
 router.get("/:id/comments", requireAuth, ideasController.getIdeaComments); // Get all comments for this Idea
-// router.get("/filter", requireAuth); // Search based on filters
-router.get("/lucky-luke", requireAuth); // Get random idea
-router.get("/popular", requireAuth); // Get most popular Ideas
-router.get("/recent", requireAuth); // Most recent Ideas
 
-router.post("/", requireAuth); // Create Idea
+// Create Idea
+// Auth -> validate body data -> processing request
+router.post(
+  "/",
+  requireAuth,
+  ideasValidation.validateIdea,
+  ideasController.createIdea,
+);
+
 router.put("/:id", requireAuth); // Update own idea
 router.delete("/:id", requireAuth); // Delete own idea
 

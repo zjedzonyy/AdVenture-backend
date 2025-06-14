@@ -6,6 +6,7 @@ const {
   UnauthorizedError,
   NotFoundError,
 } = require("../utils/error.utils");
+const prisma = require("../database/prisma");
 
 // Returns prisma orderBy based on query param sort=newest / oldest / popular...
 // Returns { createdAt: "desc" } if couldn't find any match
@@ -299,56 +300,94 @@ const getAllIdeas = async (filters, requestingUserId) => {
 
 // Get idea and then increment viewCount
 const getIdea = async (ideaId, requestingUserId) => {
-  try {
-    const idea = await db.getIdea(Number(ideaId), requestingUserId);
-    if (!idea) {
-      throw new NotFoundError("Couldn't find requested idea");
-    }
-
-    await db.incrementIdeaViewCount(Number(ideaId));
-
-    return idea;
-  } catch (error) {
-    console.error(error);
+  const idea = await db.getIdea(Number(ideaId), requestingUserId);
+  if (!idea) {
+    throw new NotFoundError("Couldn't find requested idea");
   }
+
+  await db.incrementIdeaViewCount(Number(ideaId));
+
+  return idea;
+};
+
+const getRandomIdea = async () => {
+  const ideas = await prisma.idea.findMany({ select: { id: true } });
+  if (ideas.length === 0) {
+    throw new Error("No ideas available.");
+  }
+
+  const randomId = ideas[Math.floor(Math.random() * ideas.length)].id;
+
+  const randomIdea = await db.getIdea(randomId);
+  if (!randomIdea) {
+    throw new NotFoundError(`Idea with ID ${randomId} not found`);
+  }
+
+  await db.incrementIdeaViewCount(randomId);
+
+  return randomIdea;
 };
 
 const getIdeaComments = async (ideaId, filters) => {
-  try {
-    const page = Math.max(1, parseInt(filters.page || 1));
-    const limit = Math.min(10, Math.max(1, parseInt(filters.limit)) || 10);
-    const skip = (page - 1) * limit;
+  const page = Math.max(1, parseInt(filters.page || 1));
+  const limit = Math.min(10, Math.max(1, parseInt(filters.limit)) || 10);
+  const skip = (page - 1) * limit;
 
-    if (filters.limit === "0") {
-      const { comments, totalCount } = await db.getIdeaComments(Number(ideaId));
-      return { comments, totalCount };
-    }
-    const { comments, totalCount } = await db.getIdeaComments(
-      Number(ideaId),
-      skip,
-      limit,
-    );
-
-    if (!comments) {
-      throw new NotFoundError("Couldn't find requested comments for this Idea");
-    }
-
-    const totalPages = Math.ceil(totalCount / limit);
-
-    return {
-      comments,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalItems: totalCount,
-        itemsPerPage: limit,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
-  } catch (error) {
-    console.error(error);
+  if (filters.limit === "0") {
+    const { comments, totalCount } = await db.getIdeaComments(Number(ideaId));
+    return { comments, totalCount };
   }
+  const { comments, totalCount } = await db.getIdeaComments(
+    Number(ideaId),
+    skip,
+    limit,
+  );
+
+  if (!comments) {
+    throw new NotFoundError("Couldn't find requested comments for this Idea");
+  }
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    comments,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalItems: totalCount,
+      itemsPerPage: limit,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    },
+  };
+};
+
+const createIdea = async (
+  title,
+  description,
+  isActive,
+  isChallenge,
+  durationId,
+  categories,
+  groups,
+  priceRangeId,
+  locationType,
+  authorId,
+) => {
+  const ideaId = await db.createIdea(
+    title,
+    description,
+    isActive,
+    isChallenge,
+    durationId,
+    categories,
+    groups,
+    priceRangeId,
+    locationType,
+    authorId,
+  );
+
+  return ideaId;
 };
 
 module.exports = {
@@ -356,4 +395,6 @@ module.exports = {
   buildOrderByClause,
   getIdea,
   getIdeaComments,
+  getRandomIdea,
+  createIdea,
 };

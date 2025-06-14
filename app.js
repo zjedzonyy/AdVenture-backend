@@ -70,6 +70,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get("/health-check", (req, res) => {
+  console.log("=== HEALTH CHECK ENDPOINT WYWOŁANY ===");
+  res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
 app.get("/", (req, res) => {
   res.json("Hello, it worked!");
 });
