@@ -15,6 +15,7 @@ model User {
   isPrivate Boolean @default(false)
   createdAt DateTime @default(now())
   profileViewCount Int @default(0)
+  isDeleted Boolean @default(false)
   ideas Idea[]
   comments Comment[]
   reviews Review[]
@@ -74,7 +75,7 @@ model Idea {
 
   locationType LocationType
 
-  comments Comment[]
+  comments Comment[] 
 
   reviews Review[]
 
@@ -84,7 +85,7 @@ model Idea {
 }
 
 model CategoryToIdea {
-  idea       Idea     @relation(fields: [ideaId], references: [id])
+  idea       Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId     Int
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
@@ -94,7 +95,7 @@ model CategoryToIdea {
 }
 
 model GroupSizeToIdea {
-  idea        Idea      @relation(fields: [ideaId], references: [id])
+  idea        Idea      @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId      Int
   groupSize   GroupSize @relation(fields: [groupSizeId], references: [id])
   groupSizeId Int
@@ -127,7 +128,7 @@ model UserIdeaStatus {
   user User @relation(fields: [userId], references: [id])
   userId String
 
-  idea Idea @relation(fields: [ideaId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId Int
 
   @@unique([userId, ideaId])
@@ -144,7 +145,7 @@ model Review {
   authorId String
 
 
-  idea Idea @relation(fields: [ideaId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId Int
 
 
@@ -159,7 +160,7 @@ model Comment {
   author User @relation(fields: [authorId], references: [id])
   authorId String
 
-  idea Idea @relation(fields: [ideaId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId Int
 
   createdAt DateTime @default(now())

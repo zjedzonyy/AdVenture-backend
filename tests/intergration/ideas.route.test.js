@@ -65,28 +65,27 @@ describe("/ideas", () => {
     });
   });
 
-  // describe("POST /ideas", () => {
-  //   it("should return 200", async () => {
-  //     // const ideaId = await createIdea(testUserId);
-  //     const res = await request(app)
-  //       .post("/ideas")
-  //       .set("Cookie", authCookie)
-  //       .send({
-  //         authorId: testUserId,
-  //         title: `Its just a testing title_${Date.now()}`,
-  //         description: "It's just a testing description.",
-  //         isActive: true,
-  //         isChallenge: false,
-  //         durationId: 1,
-  //         priceRangeId: 1,
-  //         locationType: "INDOOR",
-  //         categories: [2, 5],
-  //         groups: [1, 2],
-  //       });
+  describe("POST /ideas", () => {
+    it("should return 200", async () => {
+      // const ideaId = await createIdea(testUserId);
+      const res = await request(app)
+        .post("/ideas")
+        .set("Cookie", authCookie)
+        .send({
+          authorId: testUserId,
+          title: `Its just a testing title_${Date.now()}`,
+          description: "It's just a testing description.",
+          isActive: true,
+          isChallenge: false,
+          durationId: 1,
+          priceRangeId: 1,
+          locationType: "INDOOR",
+          categories: [2, 5],
+          groups: [1, 2],
+        });
 
-  //     expect(res.status).toBe(200);
-  //     console.log(res.body.ideaId);
-  //     await deleteIdea(res.body.ideaId);
-  //   });
-  // });
+      expect(res.status).toBe(200);
+      await deleteIdea(res.body.ideaId);
+    });
+  });
 });

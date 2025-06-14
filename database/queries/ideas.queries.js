@@ -214,6 +214,17 @@ const deleteIdea = async (ideaId) => {
   await prisma.idea.delete({ where: { id: ideaId } });
 };
 
+// const cleanupUser = async (id) => {
+//   await prisma.user.deleteMany({ where: { authorId: id } });
+//   await prisma.review.deleteMany({ where: { author: id } });
+//   await prisma.userIdeaStatus.deleteMany({ where: { id } });
+//   await prisma.idea.deleteMany({ where: { authorId: id } });
+//   await prisma.followRequest.deleteMany({
+//     where: { OR: [{ fromUserId: id }, { toUserId: id }] },
+//   });
+//   await prisma.userFollow.deleteMany
+// };
+
 module.exports = {
   getIdea,
   getAllIdeas,
