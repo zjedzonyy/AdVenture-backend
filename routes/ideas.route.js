@@ -3,11 +3,8 @@ const router = express.Router();
 const ideasController = require("../controllers/ideas.controller");
 const { requireAuth } = require("../middlewares/auth.middleware");
 const ideasValidation = require("../middlewares/ideas.validation");
-const { idea } = require("../database/prisma");
 
 // Add viewCount every time someone fetch Idea
-// Update averageRating
-// Count completionCount
 
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
 router.get("/lucky", ideasController.getRandomIdea); // Get random idea
@@ -23,12 +20,25 @@ router.post(
   ideasController.createIdea,
 );
 
-router.put("/:id", requireAuth); // Update own idea
-router.delete("/:id", requireAuth); // Delete own idea
+// Update own idea
+router.put(
+  "/:id",
+  requireAuth,
+  ideasValidation.validateIdea,
+  ideasController.updateIdea,
+);
 
-router.patch("/:id/activate", requireAuth); // Toggle isActive
+router.delete("/:id", requireAuth, ideasController.deleteIdea); // Delete own idea
 
-router.post("/:id/like", requireAuth); // Add to favorite
-router.delete("/:id/like", requireAuth); // Remove from favorites
+router.patch("/:id/activate", requireAuth, ideasController.toggleIsActive); // Toggle isActive
 
+// Change idea status: todo, in_progress, completed, favorited
+router.post(
+  "/:id/status",
+  requireAuth,
+  ideasValidation.validateIdeaStatus,
+  ideasController.changeStatus,
+);
+
+// Dodaj zmień Idea status:
 module.exports = router;

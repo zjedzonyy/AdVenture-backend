@@ -66,6 +66,23 @@ const validateIdea = [
   },
 ];
 
+const validateIdeaStatus = [
+  body("ideaStatus")
+    .isString()
+    .isIn(["TODO", "IN_PROGRESS", "COMPLETED", "FAVORITED"])
+    .withMessage("Status type must be valid"),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      throw new BadRequestError(errorMessages.join(", "));
+    }
+    next();
+  },
+];
+
 module.exports = {
   validateIdea,
+  validateIdeaStatus,
 };

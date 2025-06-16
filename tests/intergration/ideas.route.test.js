@@ -88,4 +88,26 @@ describe("/ideas", () => {
       await deleteIdea(res.body.ideaId);
     });
   });
+
+  describe("PUT /ideas/:id", () => {
+    it("should return 200", async () => {
+      // Frist create this post :)
+      const res = await request(app)
+        .put("/ideas/50")
+        .set("Cookie", authCookie)
+        .send({
+          authorId: testUserId,
+          title: `Its just a testing title_${Date.now()}`,
+          description: "It's just a testing description.",
+          isActive: true,
+          isChallenge: false,
+          durationId: 1,
+          priceRangeId: 1,
+          locationType: "INDOOR",
+          categories: [2, 5],
+          groups: [1, 2],
+        });
+      expect(res.status).toBe(200);
+    });
+  });
 });

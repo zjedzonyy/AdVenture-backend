@@ -390,6 +390,25 @@ const createIdea = async (
   return ideaId;
 };
 
+const isAuthor = async (ideaId, userId) => {
+  const idea = await db.getIdea(ideaId);
+
+  if (idea.author.id === userId) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {
+  const updatedStatus = await db.changeStatus(
+    ideaId,
+    requestingUserId,
+    ideaStatus,
+  );
+  return updatedStatus;
+};
+
 module.exports = {
   getAllIdeas,
   buildOrderByClause,
@@ -397,4 +416,6 @@ module.exports = {
   getIdeaComments,
   getRandomIdea,
   createIdea,
+  isAuthor,
+  changeStatus,
 };

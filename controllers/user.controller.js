@@ -18,16 +18,6 @@ const getUserProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  //     // My own profile -> all data
-  //     if (requestingUser === targetUser.username) {
-  //       userData = requestingUserData;
-  //     }
-  //     // Sciagnij user id pytajacego i o kogo sie pyta
-  //     const targetUserId =
-  //     let followingUsernames = await userService.isFollowing(requestingUserData.id, )
-
-  // };
 };
 module.exports = {
   getUserProfile,

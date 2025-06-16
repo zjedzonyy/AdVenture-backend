@@ -257,6 +257,16 @@ async function getUsersWithCommonChats(username) {
   }));
 }
 
+async function getUsersIdeaStatus(userId, ideaId) {
+  const usersIdeaStatus = await prisma.userIdeaStatus.findUnique({
+    where: {
+      userId_ideaId: [userId, ideaId],
+    },
+  });
+
+  return usersIdeaStatus;
+}
+
 module.exports = {
   createUser,
   getUser,

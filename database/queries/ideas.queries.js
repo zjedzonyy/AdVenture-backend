@@ -1,3 +1,4 @@
+const { dmmfToRuntimeDataModel } = require("@prisma/client/runtime/library");
 const prisma = require("../prisma");
 
 async function getAllIdeas(where, orderBy, skip, limit) {
@@ -22,6 +23,7 @@ async function getIdea(ideaId, requestingUserId = null) {
       id: true,
       author: {
         select: {
+          id: true,
           username: true,
         },
       },
@@ -88,6 +90,8 @@ async function getIdea(ideaId, requestingUserId = null) {
       }),
     },
   });
+
+  if (!idea) return null;
 
   return {
     ...idea,
@@ -210,20 +214,94 @@ async function createIdea(
   return idea.id;
 }
 
+async function updateIdea(
+  title,
+  description,
+  isActive,
+  isChallenge,
+  durationId,
+  categories,
+  groups,
+  priceRangeId,
+  locationType,
+  authorId,
+  ideaId,
+) {
+  const idea = await prisma.idea.update({
+    where: {
+      id: ideaId,
+      authorId: authorId,
+    },
+    data: {
+      title,
+      description,
+      isActive,
+      isChallenge,
+      durationId,
+      priceRangeId,
+      locationType,
+
+      // Delete relations then update
+      categoryLinks: {
+        deleteMany: {}, // Delete all relations
+        create:
+          categories.map((categoryId) => ({
+            categoryId: categoryId,
+          })) || [],
+      },
+      groupSizeLinks: {
+        deleteMany: {},
+        create:
+          groups.map((groupSizeId) => ({
+            groupSizeId: groupSizeId,
+          })) || [],
+      },
+    },
+  });
+
+  return idea.id;
+}
+
 const deleteIdea = async (ideaId) => {
   await prisma.idea.delete({ where: { id: ideaId } });
 };
 
-// const cleanupUser = async (id) => {
-//   await prisma.user.deleteMany({ where: { authorId: id } });
-//   await prisma.review.deleteMany({ where: { author: id } });
-//   await prisma.userIdeaStatus.deleteMany({ where: { id } });
-//   await prisma.idea.deleteMany({ where: { authorId: id } });
-//   await prisma.followRequest.deleteMany({
-//     where: { OR: [{ fromUserId: id }, { toUserId: id }] },
-//   });
-//   await prisma.userFollow.deleteMany
-// };
+const toggleIsActive = async (ideaId) => {
+  const idea = await prisma.idea.findUnique({ where: { id: ideaId } });
+
+  await prisma.idea.update({
+    where: { id: ideaId },
+    data: { isActive: !idea.isActive },
+  });
+};
+
+const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {
+  const idea = await prisma.idea.findUnique({ where: { id: ideaId } });
+  if (!idea) {
+    throw new Error("Idea not found");
+  }
+
+  const userIdeaStatus = await prisma.userIdeaStatus.upsert({
+    where: {
+      userId_ideaId: {
+        userId: requestingUserId,
+        ideaId: ideaId,
+      },
+    },
+    // If the record exists:
+    update: {
+      ideaStatus: ideaStatus,
+    },
+    // If it doesn't exist
+    create: {
+      userId: requestingUserId,
+      ideaId: ideaId,
+      ideaStatus: ideaStatus,
+    },
+  });
+
+  return userIdeaStatus.ideaStatus;
+};
 
 module.exports = {
   getIdea,
@@ -232,4 +310,7 @@ module.exports = {
   incrementIdeaViewCount,
   createIdea,
   deleteIdea,
+  updateIdea,
+  toggleIsActive,
+  changeStatus,
 };

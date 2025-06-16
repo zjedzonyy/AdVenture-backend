@@ -1,4 +1,6 @@
 const ideasService = require("../services/ideas.service");
+const { BadRequestError, UnauthorizedError } = require("../utils/error.utils");
+const db = require("../database/queries/index");
 
 const getAllIdeas = async (req, res, next) => {
   try {
@@ -20,6 +22,10 @@ const getIdea = async (req, res, next) => {
     const ideaId = req.params.id;
     const requestingUserId = req.user.id;
     const idea = await ideasService.getIdea(ideaId, requestingUserId);
+    console.log(idea);
+    if (!idea) {
+      throw new BadRequestError("Couldn't find requested Idea");
+    }
 
     res.status(200).json({
       success: true,
@@ -96,10 +102,134 @@ const createIdea = async (req, res, next) => {
   }
 };
 
+const updateIdea = async (req, res, next) => {
+  try {
+    const ideaId = Number(req.params.id);
+    const requestingUserId = req.user.id;
+    // Is user an author of this Idea?
+    const isAuthor = await ideasService.isAuthor(ideaId, requestingUserId);
+    if (!isAuthor) {
+      throw new UnauthorizedError("You're not the author of this Idea");
+    }
+
+    const authorId = requestingUserId;
+
+    const {
+      title,
+      description,
+      isActive,
+      isChallenge,
+      durationId,
+      categories,
+      groups,
+      priceRangeId,
+      locationType,
+    } = req.body;
+
+    await db.updateIdea(
+      title,
+      description,
+      isActive,
+      isChallenge,
+      durationId,
+      categories,
+      groups,
+      priceRangeId,
+      locationType,
+      authorId,
+      ideaId,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Idea has been successfully updated!",
+      ideaId,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteIdea = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+    const ideaId = Number(req.params.id);
+    const isAuthor = await ideasService.isAuthor(ideaId, requestingUserId);
+
+    if (!isAuthor) {
+      throw new UnauthorizedError("You're not the author of this Idea");
+    }
+
+    await db.deleteIdea(ideaId);
+
+    res.status(200).json({
+      success: true,
+      message: "Idea has been successfully deleted!",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const toggleIsActive = async (req, res, next) => {
+  try {
+    const ideaId = req.params.id;
+    const requestingUserId = req.user.id;
+    const isAuthor = await ideasService.isAuthor(ideaId, requestingUserId);
+
+    if (!isAuthor) {
+      throw new UnauthorizedError("You're not the author of this Idea");
+    }
+
+    await db.toggleIsActive(ideaId);
+
+    res.status(200).json({
+      success: true,
+      message: "Ideas isActive has been successfully changed!",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// Expect ideaStatus to be String:
+// TODO
+// IN_PROGRESS
+// COMPLETED
+// FAVORITED
+const changeStatus = async (req, res, next) => {
+  try {
+    const ideaId = Number(req.params.id);
+    const requestingUserId = req.user.id;
+    const ideaStatus = req.body.ideaStatus;
+
+    const updatedStatus = await ideasService.changeStatus(
+      ideaId,
+      requestingUserId,
+      ideaStatus,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Ideas status has been changed to: ${updatedStatus}`,
+      data: {
+        ideaId,
+        userId: requestingUserId,
+        status: updatedStatus,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllIdeas,
   getIdea,
   getIdeaComments,
   getRandomIdea,
   createIdea,
+  updateIdea,
+  deleteIdea,
+  toggleIsActive,
+  changeStatus,
 };
