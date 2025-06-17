@@ -1,5 +1,7 @@
 // controllers/user.controllers.js
 const userService = require("../services/user.service");
+const db = require("../database/queries/index");
+const { BadRequestError } = require("../utils/error.utils");
 
 const getUserProfile = async (req, res, next) => {
   try {
@@ -19,6 +21,41 @@ const getUserProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+const getFollowRequests = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+
+    const requests = await db.getUsersFollowRequests(requestingUserId);
+
+    res.status(200).json({
+      success: true,
+      message: `Fetched follow requests`,
+      requests,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getSentFollowRequests = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+
+    const requests = await db.getUsersSentFollowRequests(requestingUserId);
+
+    res.status(200).json({
+      success: true,
+      message: `Fetched sent follow requests`,
+      requests,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUserProfile,
+  getFollowRequests,
+  getSentFollowRequests,
 };

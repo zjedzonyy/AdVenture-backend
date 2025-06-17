@@ -1,4 +1,3 @@
-const { dmmfToRuntimeDataModel } = require("@prisma/client/runtime/library");
 const prisma = require("../prisma");
 
 async function getAllIdeas(where, orderBy, skip, limit) {
@@ -303,6 +302,30 @@ const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {
   return userIdeaStatus.ideaStatus;
 };
 
+async function createIdeaComment(userId, ideaId, description) {
+  const comment = await prisma.comment.create({
+    data: {
+      authorId: userId,
+      ideaId,
+      description,
+    },
+  });
+
+  return comment;
+}
+
+async function updateIdeaComment(userId, ideaId, commentId, description) {
+  const comment = await prisma.comment.update({
+    where: {
+      authorId: userId,
+      id: commentId,
+    },
+    data: { description },
+  });
+
+  return comment;
+}
+
 module.exports = {
   getIdea,
   getAllIdeas,
@@ -313,4 +336,5 @@ module.exports = {
   updateIdea,
   toggleIsActive,
   changeStatus,
+  createIdeaComment,
 };

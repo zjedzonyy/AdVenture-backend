@@ -56,5 +56,4 @@ const getUserProfile = async (requestingUserId, targetId) => {
 module.exports = {
   register,
   getUserProfile,
-  // getUserPrivateData,
 };

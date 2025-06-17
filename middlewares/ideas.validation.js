@@ -82,7 +82,25 @@ const validateIdeaStatus = [
   },
 ];
 
+const validateComment = [
+  body("description")
+    .isString()
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .withMessage("Description must be between 1 and 1000 characters"),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      throw new BadRequestError(errorMessages.join(", "));
+    }
+    next();
+  },
+];
+
 module.exports = {
   validateIdea,
   validateIdeaStatus,
+  validateComment,
 };

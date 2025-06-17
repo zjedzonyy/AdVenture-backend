@@ -267,6 +267,173 @@ async function getUsersIdeaStatus(userId, ideaId) {
   return usersIdeaStatus;
 }
 
+// Only for sending follow request!
+async function sendFollowRequest(requestingUserId, targetId) {
+  const followRequest = await prisma.followRequest.upsert({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: requestingUserId,
+        toUserId: targetId,
+      },
+    },
+    update: {
+      status: "PENDING",
+      createdAt: new Date(),
+    },
+    create: {
+      fromUserId: requestingUserId,
+      toUserId: targetId,
+      status: "PENDING",
+    },
+  });
+
+  return followRequest;
+}
+
+async function getExistingRequest(requestingUserId, targetId) {
+  const existingRequest = await prisma.followRequest.findUnique({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: requestingUserId,
+        toUserId: targetId,
+      },
+    },
+  });
+
+  return existingRequest;
+}
+
+async function getFollowRequest(followRequestId) {
+  const res = await prisma.followRequest.findUnique({
+    where: {
+      id: followRequestId,
+    },
+  });
+
+  return res;
+}
+
+async function deleteFollowRequest(requestingUserId, targetId) {
+  const existingRequest = await prisma.followRequest.delete({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: requestingUserId,
+        toUserId: targetId,
+      },
+    },
+  });
+}
+
+async function deleteFollowRequestByRequestId(requestId) {
+  await prisma.followRequest.delete({
+    where: {
+      id: requestId,
+    },
+  });
+}
+
+async function acceptFollowRequest(followRequestId) {
+  const result = await prisma.$transaction(async (tx) => {
+    const accept = await tx.followRequest.update({
+      where: {
+        id: followRequestId,
+      },
+      data: {
+        status: "ACCEPTED",
+      },
+    });
+
+    const follow = await tx.userFollow.create({
+      data: {
+        followerId: accept.fromUserId,
+        followingId: accept.toUserId,
+      },
+    });
+    return { request: accept, follow };
+  });
+  return result;
+}
+
+async function rejectFollowRequest(followRequestId) {
+  const res = await prisma.followRequest.update({
+    where: {
+      id: followRequestId,
+    },
+    data: {
+      status: "REJECTED",
+    },
+  });
+
+  return res;
+}
+
+async function getUserFollowing(requestingUserId, targetId) {
+  const res = await prisma.userFollow.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId: requestingUserId,
+        followingId: targetId,
+      },
+    },
+  });
+
+  return res;
+}
+
+async function unfollowUser(requestingUserId, targetId) {
+  await prisma.userFollow.delete({
+    where: {
+      followerId_followingId: {
+        followerId: requestingUserId,
+        followingId: targetId,
+      },
+    },
+  });
+}
+
+async function getUsersFollowRequests(requestingUserId) {
+  const res = await prisma.followRequest.findMany({
+    where: {
+      toUserId: requestingUserId,
+    },
+  });
+
+  return res;
+}
+
+async function getUsersSentFollowRequests(requestingUserId) {
+  const res = await prisma.followRequest.findMany({
+    where: {
+      fromUserId: requestingUserId,
+    },
+  });
+
+  return res;
+}
+
+async function getUsersFollower(requestingUserId, targetId) {
+  const res = await prisma.userFollow.findUnique({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: targetId,
+        toUserId: requestingUserId,
+      },
+    },
+  });
+  return res;
+}
+
+async function removeFollower(requestingUserId, targetId) {
+  await prisma.userFollow.delete({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: targetId,
+        toUserId: requestingUserId,
+      },
+    },
+  });
+}
+
 module.exports = {
   createUser,
   getUser,
@@ -287,4 +454,17 @@ module.exports = {
   getUserPublicData,
   getUserBasicData,
   deleteUserById,
+  getExistingRequest,
+  deleteFollowRequest,
+  getFollowRequest,
+  acceptFollowRequest,
+  rejectFollowRequest,
+  getUserFollowing,
+  unfollowUser,
+  getUsersFollowRequests,
+  getUsersSentFollowRequests,
+  getUsersFollower,
+  removeFollower,
+  sendFollowRequest,
+  deleteFollowRequestByRequestId,
 };

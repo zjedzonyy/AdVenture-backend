@@ -8,4 +8,18 @@ const { requireAuth } = require("../middlewares/auth.middleware");
 // Case 3: User requests data of someone they don't follow → receives only basic data
 router.get("/:id", requireAuth, userController.getUserProfile);
 
+// Received requests
+router.get(
+  "/me/follow-requests",
+  requireAuth,
+  userController.getFollowRequests,
+);
+
+// Sent requests
+router.get(
+  "/me/sent-follow-requests",
+  requireAuth,
+  userController.getSentFollowRequests,
+);
+
 module.exports = router;
