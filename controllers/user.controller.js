@@ -31,7 +31,7 @@ const getFollowRequests = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `Fetched follow requests`,
-      requests,
+      data: requests,
     });
   } catch (error) {
     next(error);
@@ -47,7 +47,7 @@ const getSentFollowRequests = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `Fetched sent follow requests`,
-      requests,
+      data: requests,
     });
   } catch (error) {
     next(error);

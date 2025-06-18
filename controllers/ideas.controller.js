@@ -22,7 +22,6 @@ const getIdea = async (req, res, next) => {
     const ideaId = req.params.id;
     const requestingUserId = req.user.id;
     const idea = await ideasService.getIdea(ideaId, requestingUserId);
-    console.log(idea);
     if (!idea) {
       throw new BadRequestError("Couldn't find requested Idea");
     }

@@ -25,7 +25,7 @@ const sendFollowRequest = async (req, res, next) => {
 const cancelFollowRequest = async (req, res, next) => {
   try {
     const requestingUserId = req.user.id;
-    const requestId = req.params.requestId;
+    const requestId = Number(req.params.requestId);
 
     await followRequestsService.cancelFollowRequest(
       requestingUserId,
@@ -43,17 +43,18 @@ const cancelFollowRequest = async (req, res, next) => {
 
 const acceptRequest = async (req, res, next) => {
   try {
-    const followRequestId = req.params.followRequestId;
+    const followRequestId = Number(req.params.requestId);
     const requestingUserId = req.user.id;
 
-    const acceptRequest = await followRequestsService.acceptRequest(
+    const accepted = await followRequestsService.acceptRequest(
       followRequestId,
       requestingUserId,
     );
+
     res.status(200).json({
       success: true,
       message: `Request successfully accepted`,
-      data: acceptRequest,
+      data: accepted,
     });
   } catch (error) {
     next(error);
@@ -62,10 +63,10 @@ const acceptRequest = async (req, res, next) => {
 
 const rejectRequest = async (req, res, next) => {
   try {
-    const followRequestId = req.params.requestId;
+    const followRequestId = Number(req.params.requestId);
     const requestingUserId = req.user.id;
 
-    const acceptRequest = await followRequestsService.rejectRequest(
+    const rejected = await followRequestsService.rejectRequest(
       followRequestId,
       requestingUserId,
     );
@@ -73,7 +74,7 @@ const rejectRequest = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `Request successfully rejected`,
-      data: acceptRequest,
+      data: rejected,
     });
   } catch (error) {
     next(error);

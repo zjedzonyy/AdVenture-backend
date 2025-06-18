@@ -4,6 +4,7 @@ const followRequestsController = require("../controllers/followRequests.controll
 const { requireAuth } = require("../middlewares/auth.middleware");
 
 // Send someone a request
+// Receive single Object in data
 router.post(
   "/:userId",
   requireAuth,

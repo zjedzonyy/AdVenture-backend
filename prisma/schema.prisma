@@ -31,10 +31,10 @@ model User {
 
 model FollowRequest {
   id Int @id @default(autoincrement())
-  fromUser User @relation("SentRequests", fields: [fromUserId], references: [id])
+  fromUser User @relation("SentRequests", fields: [fromUserId], references: [id], onDelete: Cascade)
   fromUserId String
 
-  toUser User @relation("ReceivedRequests", fields: [toUserId], references: [id])
+  toUser User @relation("ReceivedRequests", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
   status RequestStatus @default(PENDING)
   createdAt DateTime @default(now())
@@ -87,7 +87,7 @@ model Idea {
 model CategoryToIdea {
   idea       Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId     Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
 
   @@id([ideaId, categoryId])
@@ -97,7 +97,7 @@ model CategoryToIdea {
 model GroupSizeToIdea {
   idea        Idea      @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId      Int
-  groupSize   GroupSize @relation(fields: [groupSizeId], references: [id])
+  groupSize   GroupSize @relation(fields: [groupSizeId], references: [id], onDelete: Cascade)
   groupSizeId Int
 
   @@id([ideaId, groupSizeId])
@@ -109,10 +109,10 @@ model UserFollow {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  follower User @relation("Followers", fields: [followerId], references: [id])
+  follower User @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
   followerId String
 
-  following User @relation("Followings", fields: [followingId], references: [id])
+  following User @relation("Followings", fields: [followingId], references: [id], onDelete: Cascade)
   followingId String
 
   @@unique([followerId, followingId])
@@ -125,7 +125,7 @@ model UserIdeaStatus {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
@@ -141,7 +141,7 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  author User @relation(fields: [authorId], references: [id])
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
 
 
@@ -157,7 +157,7 @@ model Comment {
   id Int @id @default(autoincrement())
   description String
 
-  author User @relation(fields: [authorId], references: [id])
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)

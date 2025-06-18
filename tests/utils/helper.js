@@ -21,10 +21,11 @@ const removeSession = async (res) => {
 };
 
 const createUser = async (userRole = "USER") => {
-  const username = `UserForTest_${Date.now()}`;
+  const suffix = Math.random().toString(36).substring(2, 8);
+  const username = `UserForTest_${suffix}`;
   const password = "Password1";
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const email = `test_${Date.now()}@gmail.com`;
+  const hashedPassword = await bcrypt.hash(password, 1);
+  const email = `test_${suffix}@gmail.com`;
   const role = userRole === "USER" ? "USER" : "ADMIN";
 
   let authCookie;
@@ -49,7 +50,7 @@ const createUser = async (userRole = "USER") => {
     // Extract the cookie
     authCookie = res.headers["set-cookie"];
   } catch (error) {
-    console.error("createUser error: ", error);
+    throw new Error(`createUser failed: ${error.message}`);
   }
 
   return { testUserId, authCookie };

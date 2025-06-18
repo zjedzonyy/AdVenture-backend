@@ -9,6 +9,9 @@ async function createUser(username, hashedPassword, email, role = "USER") {
       role: role,
     },
   });
+  if (!newUser) {
+    throw new Error("Couldn't create a user");
+  }
 
   return newUser.id;
 }
@@ -414,9 +417,9 @@ async function getUsersSentFollowRequests(requestingUserId) {
 async function getUsersFollower(requestingUserId, targetId) {
   const res = await prisma.userFollow.findUnique({
     where: {
-      fromUserId_toUserId: {
-        fromUserId: targetId,
-        toUserId: requestingUserId,
+      followerId_followingId: {
+        followerId: targetId,
+        followingId: requestingUserId,
       },
     },
   });
@@ -426,9 +429,9 @@ async function getUsersFollower(requestingUserId, targetId) {
 async function removeFollower(requestingUserId, targetId) {
   await prisma.userFollow.delete({
     where: {
-      fromUserId_toUserId: {
-        fromUserId: targetId,
-        toUserId: requestingUserId,
+      followerId_followingId: {
+        followerId: targetId,
+        followingId: requestingUserId,
       },
     },
   });

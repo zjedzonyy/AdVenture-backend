@@ -66,7 +66,6 @@ const cancelFollowRequest = async (requestingUserId, requestId) => {
 
 const acceptRequest = async (followRequestId, requestingUserId) => {
   const followRequest = await db.getFollowRequest(followRequestId);
-
   if (!followRequest) {
     throw new BadRequestError("Follow request not found");
   }
@@ -74,6 +73,7 @@ const acceptRequest = async (followRequestId, requestingUserId) => {
     throw new BadRequestError("Cannot accept your own request");
   }
   if (followRequest.toUserId !== requestingUserId) {
+    //TUTAJ SIE WYWALA, IF SIE ZGADZA ALE BLEDU NIE PODAJE DALEJ DOBRZE. ALE WYCHODZI Z TEJ FUNKCJI
     throw new BadRequestError("You can only accept requests sent to you");
   }
   if (followRequest.status !== "PENDING") {

@@ -13,6 +13,7 @@ const unfollowUser = async (req, res, next) => {
       message: `You have unfollowed user`,
     });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
