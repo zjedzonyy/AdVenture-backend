@@ -4,29 +4,9 @@ const ideasController = require("../controllers/ideas.controller");
 const { requireAuth } = require("../middlewares/auth.middleware");
 const ideasValidation = require("../middlewares/ideas.validation");
 
-// Add viewCount every time someone fetch Idea
-
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
 router.get("/lucky", ideasController.getRandomIdea); // Get random idea
 router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
-router.get("/:id/comments", requireAuth, ideasController.getIdeaComments); // Get all comments for this Idea
-
-// Create comment for this Idea
-router.post(
-  "/:id/comments",
-  requireAuth,
-  ideasValidation.validateComment,
-  ideasController.createIdeaComment,
-);
-
-// TO PRZENIEŚĆ DO OSOBNE ROUTE COMMENT!!!!
-// Update comment
-router.patch(
-  "/:id/comments/:commentId",
-  requireAuth,
-  ideasValidation.validateComment,
-  ideasController.updateIdeaComment,
-);
 
 // Create Idea
 // Auth -> validate body data -> processing request

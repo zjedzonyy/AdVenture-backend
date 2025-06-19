@@ -1,25 +1,14 @@
 const request = require("supertest");
 const app = require("../../app");
-const db = require("../../database/queries");
-const bcrypt = require("bcryptjs");
 
-const {
-  createUser,
-  deleteUser,
-  createIdea,
-  deleteIdea,
-} = require("../utils/helper");
-const { BadRequestError } = require("../../utils/error.utils");
+const { createUser, deleteUser } = require("../utils/helper");
 
-describe("menaging folloerw and followings", () => {
+describe("menaging followers and followings", () => {
   let authCookie1;
   let testUserId1;
   let authCookie2;
   let testUserId2;
-  let authCookie3;
   let testUserId3;
-  const NONEXISTING_USER_ID = "99999999";
-  const NONEXISTING_REQUEST_ID = "1234567";
   let requestId;
 
   // Create test users and get auth cookieS
@@ -33,7 +22,6 @@ describe("menaging folloerw and followings", () => {
     testUserId2 = user2.testUserId;
     authCookie2 = user2.authCookie;
     testUserId3 = user3.testUserId;
-    authCookie3 = user3.authCookie;
 
     // Send request
     const res1 = await request(app)
@@ -42,7 +30,7 @@ describe("menaging folloerw and followings", () => {
     requestId = res1.body.data.id;
 
     // Accept it
-    const res2 = await request(app)
+    await request(app)
       .patch(`/follow-requests/${requestId}/accept`)
       .set("Cookie", authCookie2);
   });

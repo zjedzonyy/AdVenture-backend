@@ -302,7 +302,7 @@ const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {
   return userIdeaStatus.ideaStatus;
 };
 
-async function createIdeaComment(userId, ideaId, description) {
+async function createComment(userId, ideaId, description) {
   const comment = await prisma.comment.create({
     data: {
       authorId: userId,
@@ -314,7 +314,7 @@ async function createIdeaComment(userId, ideaId, description) {
   return comment;
 }
 
-async function updateIdeaComment(userId, ideaId, commentId, description) {
+async function updateComment(userId, commentId, description) {
   const comment = await prisma.comment.update({
     where: {
       authorId: userId,
@@ -324,6 +324,63 @@ async function updateIdeaComment(userId, ideaId, commentId, description) {
   });
 
   return comment;
+}
+
+async function getComment(commentId) {
+  const comment = await prisma.comment.findUnique({
+    where: {
+      id: commentId,
+    },
+  });
+
+  return comment;
+}
+
+async function likeComment(commentId, requestingUserId) {
+  const like = await prisma.likedComments.create({
+    data: {
+      userId: requestingUserId,
+      commentId: commentId,
+    },
+  });
+
+  return like;
+}
+
+async function unlikeComment(commentId, requestingUserId) {
+  const like = await prisma.likedComments.delete({
+    where: {
+      userId_commentId: {
+        userId: requestingUserId,
+        commentId: commentId,
+      },
+    },
+  });
+
+  return like;
+}
+
+async function checkIfCommentIsLiked(commentId, requestingUserId) {
+  const liked = await prisma.likedComments.findUnique({
+    where: {
+      userId_commentId: {
+        userId: requestingUserId,
+        commentId: commentId,
+      },
+    },
+  });
+
+  return liked;
+}
+
+async function deleteComment(commentId) {
+  const remove = await prisma.comment.delete({
+    where: {
+      id: commentId,
+    },
+  });
+
+  return remove;
 }
 
 module.exports = {
@@ -336,5 +393,11 @@ module.exports = {
   updateIdea,
   toggleIsActive,
   changeStatus,
-  createIdeaComment,
+  createComment,
+  updateComment,
+  getComment,
+  likeComment,
+  checkIfCommentIsLiked,
+  unlikeComment,
+  deleteComment,
 };

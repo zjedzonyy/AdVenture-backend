@@ -48,21 +48,6 @@ const getRandomIdea = async (req, res, next) => {
   }
 };
 
-const getIdeaComments = async (req, res, next) => {
-  try {
-    const filters = req.query;
-    const ideaId = req.params.id;
-    const comments = await ideasService.getIdeaComments(ideaId, filters);
-
-    res.status(200).json({
-      success: true,
-      data: comments,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 const createIdea = async (req, res, next) => {
   try {
     const authorId = req.user.id;
@@ -221,62 +206,13 @@ const changeStatus = async (req, res, next) => {
   }
 };
 
-const createIdeaComment = async (req, res, next) => {
-  try {
-    const requestingUserId = req.user.id;
-    const description = req.body.description;
-    const ideaId = Number(req.params.id);
-
-    const comment = await db.createIdeaComment(
-      requestingUserId,
-      ideaId,
-      description,
-    );
-
-    res.status(200).json({
-      success: true,
-      message: `Comment has been successfully created`,
-      data: comment,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const updateIdeaComment = async (req, res, next) => {
-  try {
-    const requestingUserId = req.user.id;
-    const description = req.body.description;
-    const ideaId = Number(req.params.id);
-    const commentId = Number(req.params.id);
-
-    const comment = await db.updateIdeaComment(
-      requestingUserId,
-      ideaId,
-      commentId,
-      description,
-    );
-
-    res.status(200).json({
-      success: true,
-      message: `Comment has been successfully updated`,
-      data: comment,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 module.exports = {
   getAllIdeas,
   getIdea,
-  getIdeaComments,
   getRandomIdea,
   createIdea,
   updateIdea,
   deleteIdea,
   toggleIsActive,
   changeStatus,
-  createIdeaComment,
-  updateIdeaComment,
 };

@@ -18,6 +18,7 @@ model User {
   isDeleted Boolean @default(false)
   ideas Idea[]
   comments Comment[]
+  likedComments LikedComments[]
   reviews Review[]
   follower UserFollow[] @relation("Followings")
   following UserFollow[] @relation("Followers")
@@ -27,6 +28,22 @@ model User {
   role      Role     @default(USER)
 
   @@map("user")
+}
+
+model LikedComments {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId Int
+
+  @@unique([userId, commentId])
+  @@map("liked_comments")
+
 }
 
 model FollowRequest {
@@ -162,6 +179,8 @@ model Comment {
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId Int
+
+  likedComment LikedComments[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

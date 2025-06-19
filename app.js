@@ -23,6 +23,7 @@ const usersRouter = require("./routes/user.route.js");
 const ideasRouter = require("./routes/ideas.route.js");
 const followRequestsRouter = require("./routes/followRequests.route.js");
 const followsRouter = require("./routes/follows.route.js");
+const commentsRouter = require("./routes/comments.route.js");
 
 const app = express();
 const pool = new Pool({
@@ -87,6 +88,7 @@ app.use("/users", usersRouter);
 app.use("/ideas", ideasRouter);
 app.use("/follow-requests", followRequestsRouter);
 app.use("/follows", followsRouter);
+app.use("/comments", commentsRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {
