@@ -5,6 +5,7 @@ const { requireAuth } = require("../middlewares/auth.middleware");
 const ideasValidation = require("../middlewares/ideas.validation");
 
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
+router.get("/filters", requireAuth, ideasController.getFilters); // Get filters (doesn't include enums)
 router.get("/lucky", ideasController.getRandomIdea); // Get random idea
 router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
 
@@ -35,6 +36,17 @@ router.post(
   requireAuth,
   ideasValidation.validateIdeaStatus,
   ideasController.changeStatus,
+);
+
+// Get your review
+router.get("/:ideaId/review", requireAuth, ideasController.getReview);
+
+// Create review
+router.post(
+  "/:ideaId/review",
+  requireAuth,
+  ideasValidation.validateReview,
+  ideasController.createReview,
 );
 
 // Dodaj zmień Idea status:

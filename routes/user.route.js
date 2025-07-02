@@ -3,6 +3,10 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { requireAuth } = require("../middlewares/auth.middleware");
 
+// Get users based on fitlers
+router.get("/", requireAuth, userController.getUsers);
+
+router.get("/me", requireAuth, userController.getMineProfile);
 // Case 1: User requests their own data → receives all data
 // Case 2: User requests data of someone they follow → receives public data
 // Case 3: User requests data of someone they don't follow → receives only basic data

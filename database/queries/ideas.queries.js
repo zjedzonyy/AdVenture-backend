@@ -119,6 +119,11 @@ async function getIdeaComments(ideaId, skip, limit) {
     },
     select: {
       id: true,
+      _count: {
+        select: {
+          likedComment: true,
+        },
+      },
       author: {
         select: {
           username: true,
@@ -155,14 +160,16 @@ async function getIdeaComments(ideaId, skip, limit) {
   return {
     comments: comments.map(({ author, ...rest }) => ({
       ...rest,
+      commentLikes: rest._count.likedComment,
       author: {
         ...author,
         followerCount: author._count.follower,
         followingCount: author._count.following,
-        userIdeaRating: author.reviews[0].rating,
+        userIdeaRating: author.reviews[0]?.rating,
         _count: undefined,
         reviews: undefined,
       },
+      _count: undefined,
     })),
     totalCount,
   };
@@ -383,6 +390,76 @@ async function deleteComment(commentId) {
   return remove;
 }
 
+async function createReview(requestingUserId, rating, ideaId) {
+  const review = await prisma.review.upsert({
+    where: {
+      authorId_ideaId: {
+        ideaId,
+        authorId: requestingUserId,
+      },
+    },
+    update: {
+      rating,
+    },
+    create: {
+      rating,
+      ideaId,
+      authorId: requestingUserId,
+    },
+  });
+
+  return review;
+}
+
+async function getReview(requestingUserId, ideaId) {
+  const review = await prisma.review.findUnique({
+    where: {
+      authorId_ideaId: {
+        ideaId,
+        authorId: requestingUserId,
+      },
+    },
+  });
+  if (!review) {
+    return "You didn't rate yet";
+  }
+
+  return review;
+}
+
+async function getFilters() {
+  // price-ranges
+  const priceRanges = await prisma.priceRange.findMany({
+    select: {
+      id: true,
+      label: true,
+    },
+  });
+
+  const durations = await prisma.duration.findMany({
+    select: {
+      id: true,
+      label: true,
+    },
+  });
+
+  const groups = await prisma.groupSize.findMany({
+    select: {
+      id: true,
+      label: true,
+    },
+  });
+
+  const categories = await prisma.category.findMany({
+    select: {
+      id: true,
+      label: true,
+    },
+  });
+
+  return { priceRanges, durations, groups, categories };
+}
+
 module.exports = {
   getIdea,
   getAllIdeas,
@@ -400,4 +477,7 @@ module.exports = {
   checkIfCommentIsLiked,
   unlikeComment,
   deleteComment,
+  createReview,
+  getReview,
+  getFilters,
 };

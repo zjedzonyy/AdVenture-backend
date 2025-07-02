@@ -70,6 +70,7 @@ const getComments = async (req, res, next) => {
   try {
     const filters = req.query;
     const ideaId = Number(req.params.ideaId);
+
     const comments = await commentsService.getComments(ideaId, filters);
 
     res.status(200).json({
@@ -85,7 +86,6 @@ const likeComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
     const requestingUserId = req.user.id;
-
     const like = await commentsService.likeComment(commentId, requestingUserId);
 
     res.status(200).json({

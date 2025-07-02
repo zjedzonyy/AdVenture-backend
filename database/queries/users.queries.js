@@ -1,3 +1,4 @@
+const { selectFields } = require("express-validator/lib/field-selection");
 const prisma = require("../prisma");
 
 async function createUser(username, hashedPassword, email, role = "USER") {
@@ -37,17 +38,44 @@ async function getUserPrivateData(id) {
       username: true,
       createdAt: true,
       profileViewCount: true,
+      isPrivate: true,
       ideas: true,
       comments: true,
       reviews: true,
-      follower: true,
-      following: true,
-      ideaStatus: true,
+      ideaStatus: {
+        where: {
+          ideaStatus: { in: ["TODO", "FAVORITED"] },
+        },
+        select: {
+          ideaStatus: true,
+          idea: true,
+        },
+      },
       role: true,
+      _count: {
+        select: {
+          follower: true,
+          following: true,
+          ideaStatus: {
+            where: {
+              ideaStatus: "COMPLETED",
+            },
+          },
+        },
+      },
     },
   });
 
-  return user;
+  return {
+    ...user,
+    todoIdeas: user.ideaStatus
+      .filter((idea) => idea.ideaStatus === "TODO")
+      .map((idea) => idea.idea),
+    favoritedIdeas: user.ideaStatus
+      .filter((idea) => idea.ideaStatus === "FAVORITED")
+      .map((idea) => idea.idea),
+    ideaStatus: undefined,
+  };
 }
 
 async function getUserPublicData(id) {
@@ -67,7 +95,7 @@ async function getUserPublicData(id) {
       role: true,
     },
   });
-
+  console.log(user);
   return user;
 }
 
@@ -306,25 +334,37 @@ async function getExistingRequest(requestingUserId, targetId) {
   return existingRequest;
 }
 
-async function getFollowRequest(followRequestId) {
+async function getFollowRequest(requestingUserId, toUserId) {
   const res = await prisma.followRequest.findUnique({
     where: {
-      id: followRequestId,
+      fromUserId_toUserId: {
+        fromUserId: requestingUserId,
+        toUserId: toUserId,
+      },
     },
   });
 
   return res;
 }
 
-async function deleteFollowRequest(requestingUserId, targetId) {
-  const existingRequest = await prisma.followRequest.delete({
+async function getFollowRequestById(requestId) {
+  const res = await prisma.followRequest.findUnique({
     where: {
-      fromUserId_toUserId: {
-        fromUserId: requestingUserId,
-        toUserId: targetId,
-      },
+      id: requestId,
     },
   });
+
+  return res;
+}
+
+async function deleteFollowRequest(requestId) {
+  const existingRequest = await prisma.followRequest.delete({
+    where: {
+      id: requestId,
+    },
+  });
+
+  return existingRequest;
 }
 
 async function deleteFollowRequestByRequestId(requestId) {
@@ -398,20 +438,52 @@ async function getUsersFollowRequests(requestingUserId) {
   const res = await prisma.followRequest.findMany({
     where: {
       toUserId: requestingUserId,
+      status: "PENDING",
+    },
+    select: {
+      id: true,
+      fromUserId: true,
+      status: true,
+      createdAt: true,
+      fromUser: {
+        select: {
+          username: true,
+        },
+      },
     },
   });
 
-  return res;
+  return res.map((item) => ({
+    ...item,
+    fromUsername: item.fromUser.username,
+    fromUser: undefined,
+  }));
 }
 
 async function getUsersSentFollowRequests(requestingUserId) {
   const res = await prisma.followRequest.findMany({
     where: {
       fromUserId: requestingUserId,
+      status: "PENDING",
+    },
+    select: {
+      id: true,
+      toUserId: true,
+      status: true,
+      createdAt: true,
+      toUser: {
+        select: {
+          username: true,
+        },
+      },
     },
   });
 
-  return res;
+  return res.map((item) => ({
+    ...item,
+    toUsername: item.toUser.username,
+    toUser: undefined,
+  }));
 }
 
 async function getUsersFollower(requestingUserId, targetId) {
@@ -435,6 +507,90 @@ async function removeFollower(requestingUserId, targetId) {
       },
     },
   });
+}
+
+async function getUsers(username) {
+  const users = await prisma.user.findMany({
+    where: {
+      username: {
+        contains: username,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+      createdAt: true,
+      profileViewCount: true,
+      ideas: true,
+      comments: true,
+      ideaStatus: true,
+      role: true,
+      _count: {
+        select: {
+          follower: true,
+          following: true,
+        },
+      },
+    },
+  });
+
+  return [
+    ...users.map((user) => ({
+      ...user,
+      followersCount: user._count.follower,
+      followingsCount: user._count.following,
+      _count: undefined,
+    })),
+  ];
+}
+
+async function getUserFollowers(targetId) {
+  const users = await prisma.userFollow.findMany({
+    where: {
+      followingId: targetId,
+    },
+    select: {
+      id: true,
+      createdAt: true,
+      followerId: true,
+      follower: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+
+  return users.map((user) => ({
+    ...user,
+    followerUsername: user.follower.username,
+    follower: undefined,
+  }));
+}
+
+async function getUserFollowings(targetId) {
+  const users = await prisma.userFollow.findMany({
+    where: {
+      followerId: targetId,
+    },
+    select: {
+      id: true,
+      createdAt: true,
+      followingId: true,
+      following: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+
+  return users.map((user) => ({
+    ...user,
+    followingUsername: user.following.username,
+    following: undefined,
+  }));
 }
 
 module.exports = {
@@ -470,4 +626,8 @@ module.exports = {
   removeFollower,
   sendFollowRequest,
   deleteFollowRequestByRequestId,
+  getUsers,
+  getFollowRequestById,
+  getUserFollowers,
+  getUserFollowings,
 };

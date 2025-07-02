@@ -22,12 +22,25 @@ const getUserProfile = async (req, res, next) => {
   }
 };
 
-const getFollowRequests = async (req, res, next) => {
+const getMineProfile = async (req, res, next) => {
   try {
     const requestingUserId = req.user.id;
 
-    const requests = await db.getUsersFollowRequests(requestingUserId);
+    const userData = await userService.getMineProfile(requestingUserId);
 
+    res.status(200).json({
+      success: true,
+      data: userData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getFollowRequests = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+    const requests = await db.getUsersFollowRequests(requestingUserId);
     res.status(200).json({
       success: true,
       message: `Fetched follow requests`,
@@ -54,8 +67,26 @@ const getSentFollowRequests = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    const username = req.query.username;
+
+    const users = await db.getUsers(username);
+
+    res.status(200).json({
+      success: true,
+      message: `Found users`,
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUserProfile,
   getFollowRequests,
   getSentFollowRequests,
+  getMineProfile,
+  getUsers,
 };

@@ -47,7 +47,7 @@ const sendFollowRequest = async (requestingUserId, targetId) => {
 };
 
 const cancelFollowRequest = async (requestingUserId, requestId) => {
-  const existingRequest = await db.getFollowRequest(requestId);
+  const existingRequest = await db.getFollowRequestById(requestId);
 
   if (!existingRequest) {
     throw new BadRequestError("Follow request not found");
@@ -61,11 +61,11 @@ const cancelFollowRequest = async (requestingUserId, requestId) => {
     throw new BadRequestError("Can only cancel pending requests");
   }
 
-  await db.deleteFollowRequestByRequestId(requestId);
+  await db.deleteFollowRequest(requestId);
 };
 
 const acceptRequest = async (followRequestId, requestingUserId) => {
-  const followRequest = await db.getFollowRequest(followRequestId);
+  const followRequest = await db.getFollowRequestById(followRequestId);
   if (!followRequest) {
     throw new BadRequestError("Follow request not found");
   }
@@ -73,7 +73,6 @@ const acceptRequest = async (followRequestId, requestingUserId) => {
     throw new BadRequestError("Cannot accept your own request");
   }
   if (followRequest.toUserId !== requestingUserId) {
-    //TUTAJ SIE WYWALA, IF SIE ZGADZA ALE BLEDU NIE PODAJE DALEJ DOBRZE. ALE WYCHODZI Z TEJ FUNKCJI
     throw new BadRequestError("You can only accept requests sent to you");
   }
   if (followRequest.status !== "PENDING") {
@@ -86,7 +85,7 @@ const acceptRequest = async (followRequestId, requestingUserId) => {
 };
 
 const rejectRequest = async (followRequestId, requestingUserId) => {
-  const followRequest = await db.getFollowRequest(followRequestId);
+  const followRequest = await db.getFollowRequestById(followRequestId);
 
   if (!followRequest) {
     throw new BadRequestError("Follow request not found");

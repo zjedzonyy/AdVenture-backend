@@ -46,8 +46,11 @@ const likeComment = async (commentId, requestingUserId) => {
     throw new BadRequestError("Comment not found");
   }
   const liked = await db.checkIfCommentIsLiked(commentId, requestingUserId);
+
   if (liked) {
-    throw new BadRequestError("Comment already liked");
+    const unlike = await db.unlikeComment(commentId, requestingUserId);
+
+    return unlike;
   }
 
   const like = await db.likeComment(commentId, requestingUserId);

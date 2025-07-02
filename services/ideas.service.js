@@ -375,6 +375,17 @@ const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {
   return updatedStatus;
 };
 
+const createReview = async (requestingUserId, rating, ideaId) => {
+  const idea = await db.getIdea(ideaId);
+  if (!idea) {
+    throw new BadRequestError("Idea not found");
+  }
+
+  const rate = await db.createReview(requestingUserId, rating, ideaId);
+
+  return rate;
+};
+
 module.exports = {
   getAllIdeas,
   buildOrderByClause,
@@ -383,4 +394,5 @@ module.exports = {
   createIdea,
   isAuthor,
   changeStatus,
+  createReview,
 };

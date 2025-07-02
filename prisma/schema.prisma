@@ -16,6 +16,7 @@ model User {
   createdAt DateTime @default(now())
   profileViewCount Int @default(0)
   isDeleted Boolean @default(false)
+  avatarUrl String?
   ideas Idea[]
   comments Comment[]
   likedComments LikedComments[]
@@ -72,6 +73,8 @@ model Idea {
   authorId String
   title String 
   description String
+  detailedDescription String
+  images IdeaImage[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isActive Boolean
@@ -100,6 +103,20 @@ model Idea {
 
   @@map("idea")
 }
+
+model IdeaImage {
+  id String @id @default(cuid())
+  imageUrl String // URL from Supabase storage
+  fileName String // original file name
+  fileSize Int? // size in bytes
+  order Int @default(0)
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  ideaId Int
+
+  @@map("idea_images")
+}
+
 
 model CategoryToIdea {
   idea       Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
@@ -154,7 +171,7 @@ model UserIdeaStatus {
 
 model Review {
   id Int @id @default(autoincrement())
-  rating Int
+  rating Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

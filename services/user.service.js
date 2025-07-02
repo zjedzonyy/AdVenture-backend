@@ -53,7 +53,15 @@ const getUserProfile = async (requestingUserId, targetId) => {
   }
 };
 
+const getMineProfile = async (requestingUserId) => {
+  return await db.getUserPrivateData(requestingUserId);
+};
+
+const getUsers = async (username) => {};
+
 module.exports = {
   register,
   getUserProfile,
+  getMineProfile,
+  getUsers,
 };

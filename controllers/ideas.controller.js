@@ -186,6 +186,8 @@ const changeStatus = async (req, res, next) => {
     const requestingUserId = req.user.id;
     const ideaStatus = req.body.ideaStatus;
 
+    console.log("Rozpoczynam i mam: ", ideaId, ideaStatus);
+
     const updatedStatus = await ideasService.changeStatus(
       ideaId,
       requestingUserId,
@@ -206,6 +208,58 @@ const changeStatus = async (req, res, next) => {
   }
 };
 
+const createReview = async (req, res, next) => {
+  try {
+    const ideaId = Number(req.params.ideaId);
+    const requestingUserId = req.user.id;
+    const rating = req.body.rating;
+
+    const review = await ideasService.createReview(
+      requestingUserId,
+      rating,
+      ideaId,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Rated idea`,
+      data: review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getReview = async (req, res, next) => {
+  try {
+    const ideaId = Number(req.params.ideaId);
+    const requestingUserId = req.user.id;
+    const review = await db.getReview(requestingUserId, ideaId);
+
+    res.status(200).json({
+      success: true,
+      data: review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getFilters = async (req, res, next) => {
+  try {
+    console.log("Przyjalem");
+
+    const filters = await db.getFilters();
+
+    res.status(200).json({
+      success: true,
+      data: filters,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllIdeas,
   getIdea,
@@ -215,4 +269,7 @@ module.exports = {
   deleteIdea,
   toggleIsActive,
   changeStatus,
+  createReview,
+  getReview,
+  getFilters,
 };

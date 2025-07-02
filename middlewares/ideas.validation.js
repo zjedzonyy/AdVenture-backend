@@ -99,8 +99,18 @@ const validateComment = [
   },
 ];
 
+const validateReview = [
+  body("rating")
+    .optional()
+    .isFloat({ min: 1, max: 5 })
+    .withMessage("Rating must be a number between 1 and 5")
+    .custom((value) => value * 2 === Math.floor(value * 2))
+    .withMessage("Rating must be in 0.5 increments"),
+];
+
 module.exports = {
   validateIdea,
   validateIdeaStatus,
   validateComment,
+  validateReview,
 };
