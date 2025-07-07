@@ -21,11 +21,12 @@ passport.use(
 
 // Send user.id on successfull login
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, { id: user.id, avatarUrl: user.avatarUrl });
 });
 
 // On request get id and fetch user's data from db
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (idOrObj, done) => {
+  const id = typeof idOrObj === "object" ? idOrObj.id : idOrObj;
   try {
     const user = await db.getUserById(id);
     done(null, user);

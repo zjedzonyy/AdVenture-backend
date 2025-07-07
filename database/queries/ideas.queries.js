@@ -24,10 +24,12 @@ async function getIdea(ideaId, requestingUserId = null) {
         select: {
           id: true,
           username: true,
+          avatarUrl: true,
         },
       },
       title: true,
       description: true,
+      detailedDescription: true,
       createdAt: true,
       updatedAt: true,
       isActive: true,
@@ -128,6 +130,7 @@ async function getIdeaComments(ideaId, skip, limit) {
         select: {
           username: true,
           createdAt: true,
+          avatarUrl: true,
           reviews: {
             where: {
               ideaId: ideaId,
@@ -185,6 +188,7 @@ async function incrementIdeaViewCount(ideaId) {
 async function createIdea(
   title,
   description,
+  detailedDescription,
   isActive,
   isChallenge,
   durationId,
@@ -199,6 +203,7 @@ async function createIdea(
       authorId,
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,
@@ -223,6 +228,7 @@ async function createIdea(
 async function updateIdea(
   title,
   description,
+  detailedDescription,
   isActive,
   isChallenge,
   durationId,
@@ -241,6 +247,7 @@ async function updateIdea(
     data: {
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,

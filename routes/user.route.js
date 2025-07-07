@@ -2,6 +2,11 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { requireAuth } = require("../middlewares/auth.middleware");
+const multer = require("multer");
+
+//File storage config
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Get users based on fitlers
 router.get("/", requireAuth, userController.getUsers);
@@ -26,5 +31,16 @@ router.get(
   requireAuth,
   userController.getSentFollowRequests,
 );
+
+// Upload/update avatar
+router.post(
+  "/avatars",
+  requireAuth,
+  upload.single("file"),
+  userController.uploadAvatar,
+);
+
+// Delete avatar
+router.delete("/avatars", requireAuth, userController.deleteAvatar);
 
 module.exports = router;

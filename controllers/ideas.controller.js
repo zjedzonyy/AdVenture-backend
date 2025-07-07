@@ -41,7 +41,7 @@ const getRandomIdea = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: randomIdea,
+      data: randomIdea.id,
     });
   } catch (error) {
     next(error);
@@ -54,6 +54,7 @@ const createIdea = async (req, res, next) => {
     const {
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,
@@ -66,6 +67,7 @@ const createIdea = async (req, res, next) => {
     const ideaId = await ideasService.createIdea(
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,
@@ -101,6 +103,7 @@ const updateIdea = async (req, res, next) => {
     const {
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,
@@ -113,6 +116,7 @@ const updateIdea = async (req, res, next) => {
     await db.updateIdea(
       title,
       description,
+      detailedDescription,
       isActive,
       isChallenge,
       durationId,

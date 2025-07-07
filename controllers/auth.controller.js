@@ -27,7 +27,10 @@ async function registerUser(req, res, next) {
 }
 
 async function loginUser(req, res) {
-  res.json({ message: "Logged in successfully", user: req.user.username });
+  res.json({
+    message: "Logged in successfully",
+    data: { user: req.user.username, avatarUrl: req.user.avatarUrl },
+  });
 }
 
 function logout(req, res, next) {

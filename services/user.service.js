@@ -6,6 +6,8 @@ const {
   UnauthorizedError,
   NotFoundError,
 } = require("../utils/error.utils");
+const supabaseAdmin = require("../database/supabase/supabase");
+const { request } = require("express");
 
 const register = async ({ username, password, email }) => {
   if (!username || !password || !email) {
@@ -57,11 +59,51 @@ const getMineProfile = async (requestingUserId) => {
   return await db.getUserPrivateData(requestingUserId);
 };
 
-const getUsers = async (username) => {};
+const uploadAvatar = async (requestingUserId, file) => {
+  const fileName = `${requestingUserId}-avatar`;
+  const filePath = `avatars/${requestingUserId}/${fileName}`;
+
+  const { data, error } = await supabaseAdmin.storage
+    .from("avatars")
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+      upsert: true,
+    });
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  const publicUrl = supabaseAdmin.storage.from("avatars").getPublicUrl(filePath)
+    .data.publicUrl;
+
+  // save in db
+  const save = await db.uploadAvatar(requestingUserId, publicUrl);
+
+  return save;
+};
+
+const deleteAvatar = async (requestingUserId) => {
+  const fileName = `${requestingUserId}-avatar`;
+  const filePath = `avatars/${requestingUserId}/${fileName}`;
+  const { data, error } = await supabaseAdmin.storage
+    .from("avatars")
+    .remove([filePath]);
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  //delete link from db
+  await db.deleteAvatar(requestingUserId);
+
+  return;
+};
 
 module.exports = {
   register,
   getUserProfile,
   getMineProfile,
-  getUsers,
+  uploadAvatar,
+  deleteAvatar,
 };

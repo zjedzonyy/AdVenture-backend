@@ -83,10 +83,45 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+const uploadAvatar = async (req, res, next) => {
+  try {
+    const file = req.file;
+    const requestingUserId = req.user.id;
+    if (!file) {
+      throw new BadRequestError("Must include file");
+    }
+    await userService.uploadAvatar(requestingUserId, file);
+
+    res.status(200).json({
+      success: true,
+      message: `Avatar uploaded`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteAvatar = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+
+    await userService.deleteAvatar(requestingUserId);
+
+    res.status(200).json({
+      success: true,
+      message: `Avatar deleted`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUserProfile,
   getFollowRequests,
   getSentFollowRequests,
   getMineProfile,
   getUsers,
+  uploadAvatar,
+  deleteAvatar,
 };

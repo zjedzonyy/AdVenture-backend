@@ -37,6 +37,7 @@ async function getUserPrivateData(id) {
       email: true,
       username: true,
       createdAt: true,
+      avatarUrl: true,
       profileViewCount: true,
       isPrivate: true,
       ideas: true,
@@ -87,6 +88,7 @@ async function getUserPublicData(id) {
       username: true,
       createdAt: true,
       profileViewCount: true,
+      avatarUrl: true,
       ideas: true,
       comments: true,
       follower: true,
@@ -108,6 +110,7 @@ async function getUserBasicData(id) {
       username: true,
       createdAt: true,
       profileViewCount: true,
+      avatarUrl: true,
       follower: true,
       following: true,
     },
@@ -522,6 +525,7 @@ async function getUsers(username) {
       username: true,
       createdAt: true,
       profileViewCount: true,
+      avatarUrl: true,
       ideas: true,
       comments: true,
       ideaStatus: true,
@@ -593,6 +597,28 @@ async function getUserFollowings(targetId) {
   }));
 }
 
+async function uploadAvatar(requestingUserId, avatarUrl) {
+  await prisma.user.update({
+    where: {
+      id: requestingUserId,
+    },
+    data: {
+      avatarUrl: avatarUrl,
+    },
+  });
+}
+
+async function deleteAvatar(requestingUserId) {
+  await prisma.user.update({
+    where: {
+      id: requestingUserId,
+    },
+    data: {
+      avatarUrl: null,
+    },
+  });
+}
+
 module.exports = {
   createUser,
   getUser,
@@ -630,4 +656,6 @@ module.exports = {
   getFollowRequestById,
   getUserFollowers,
   getUserFollowings,
+  uploadAvatar,
+  deleteAvatar,
 };

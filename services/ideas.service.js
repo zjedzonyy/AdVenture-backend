@@ -331,6 +331,7 @@ const getRandomIdea = async () => {
 const createIdea = async (
   title,
   description,
+  detailedDescription,
   isActive,
   isChallenge,
   durationId,
@@ -343,6 +344,7 @@ const createIdea = async (
   const ideaId = await db.createIdea(
     title,
     description,
+    detailedDescription,
     isActive,
     isChallenge,
     durationId,

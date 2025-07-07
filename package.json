@@ -8,7 +8,7 @@
     "test": "dotenv -e .env.test -- jest",
     "test:watch": "dotenv -e .env.test -- jest --watchAll",
     "migrate:dev": "npx prisma migrate dev",
-    "migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy", 
+    "migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
     "migrate:prod": "dotenv -e .env.prod -- npx prisma migrate deploy",
     "db:reset:dev": "dotenv -e .env -- npx prisma migrate reset",
     "db:reset:test": "dotenv -e .env.test -- npx prisma migrate reset",
@@ -24,6 +24,7 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.7.0",
+    "@supabase/supabase-js": "^2.50.3",
     "bcryptjs": "^3.0.2",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
@@ -33,6 +34,7 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
     "morgan": "^1.10.0",
+    "multer": "^2.0.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   },
