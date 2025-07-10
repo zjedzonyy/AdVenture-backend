@@ -3,6 +3,15 @@ const prisma = require("../prisma");
 async function getAllIdeas(where, orderBy, skip, limit) {
   const ideas = await prisma.idea.findMany({
     where,
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          avatarUrl: true,
+        },
+      },
+    },
     orderBy,
     skip: skip,
     take: limit,
@@ -10,7 +19,16 @@ async function getAllIdeas(where, orderBy, skip, limit) {
 
   const totalCount = await prisma.idea.count({ where });
 
-  return [ideas, totalCount];
+  return [
+    ideas.map((idea) => ({
+      ...idea,
+      authorId: idea.author.id,
+      authorUsername: idea.author.username,
+      authorAvatarUrl: idea.author.avatarUrl,
+      author: undefined,
+    })),
+    totalCount,
+  ];
 }
 
 async function getIdea(ideaId, requestingUserId = null) {
@@ -467,6 +485,44 @@ async function getFilters() {
   return { priceRanges, durations, groups, categories };
 }
 
+async function getPopularIdeas() {
+  const ideas = await prisma.idea.findMany({
+    select: {
+      id: true,
+      author: {
+        select: {
+          username: true,
+          id: true,
+          avatarUrl: true,
+        },
+      },
+      title: true,
+      description: true,
+      createdAt: true,
+      isActive: true,
+      viewCount: true,
+      averageRating: true,
+      completionCount: true,
+      isChallenge: true,
+      durationId: true,
+      priceRangeId: true,
+      locationType: true,
+    },
+    orderBy: { viewCount: "desc" },
+    take: 6,
+  });
+
+  return [
+    ...ideas.map((idea) => ({
+      ...idea,
+      authorId: idea.author.id,
+      authorUsername: idea.author.username,
+      authorAvatarUrl: idea.author.avatarUrl,
+      author: undefined,
+    })),
+  ];
+}
+
 module.exports = {
   getIdea,
   getAllIdeas,
@@ -487,4 +543,5 @@ module.exports = {
   createReview,
   getReview,
   getFilters,
+  getPopularIdeas,
 };

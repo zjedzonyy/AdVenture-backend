@@ -7,6 +7,7 @@ const {
   NotFoundError,
 } = require("../utils/error.utils");
 const prisma = require("../database/prisma");
+const viewsCache = require("../utils/views.cache");
 
 // Returns prisma orderBy based on query param sort=newest / oldest / popular...
 // Returns { createdAt: "desc" } if couldn't find any match
@@ -300,12 +301,16 @@ const getAllIdeas = async (filters, requestingUserId) => {
 
 // Get idea and then increment viewCount
 const getIdea = async (ideaId, requestingUserId) => {
-  const idea = await db.getIdea(Number(ideaId), requestingUserId);
+  const idea = await db.getIdea(ideaId, requestingUserId);
   if (!idea) {
     throw new NotFoundError("Couldn't find requested idea");
   }
 
-  await db.incrementIdeaViewCount(Number(ideaId));
+  const userKey = `${requestingUserId}:${ideaId}`;
+
+  if (viewsCache.shouldTrackView(userKey)) {
+    await db.incrementIdeaViewCount(ideaId);
+  }
 
   return idea;
 };
@@ -322,8 +327,6 @@ const getRandomIdea = async () => {
   if (!randomIdea) {
     throw new NotFoundError(`Idea with ID ${randomId} not found`);
   }
-
-  await db.incrementIdeaViewCount(randomId);
 
   return randomIdea;
 };

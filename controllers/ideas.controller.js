@@ -19,9 +19,11 @@ const getAllIdeas = async (req, res, next) => {
 
 const getIdea = async (req, res, next) => {
   try {
-    const ideaId = req.params.id;
+    const ideaId = Number(req.params.id);
     const requestingUserId = req.user.id;
+
     const idea = await ideasService.getIdea(ideaId, requestingUserId);
+
     if (!idea) {
       throw new BadRequestError("Couldn't find requested Idea");
     }
@@ -190,8 +192,6 @@ const changeStatus = async (req, res, next) => {
     const requestingUserId = req.user.id;
     const ideaStatus = req.body.ideaStatus;
 
-    console.log("Rozpoczynam i mam: ", ideaId, ideaStatus);
-
     const updatedStatus = await ideasService.changeStatus(
       ideaId,
       requestingUserId,
@@ -251,8 +251,6 @@ const getReview = async (req, res, next) => {
 
 const getFilters = async (req, res, next) => {
   try {
-    console.log("Przyjalem");
-
     const filters = await db.getFilters();
 
     res.status(200).json({
@@ -261,6 +259,19 @@ const getFilters = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+const getPopularIdeas = async (req, res, next) => {
+  try {
+    const ideas = await db.getPopularIdeas();
+
+    res.status(200).json({
+      success: true,
+      data: ideas,
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -276,4 +287,5 @@ module.exports = {
   createReview,
   getReview,
   getFilters,
+  getPopularIdeas,
 };

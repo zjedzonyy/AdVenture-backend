@@ -63,24 +63,39 @@ const uploadAvatar = async (requestingUserId, file) => {
   const fileName = `${requestingUserId}-avatar`;
   const filePath = `avatars/${requestingUserId}/${fileName}`;
 
-  const { data, error } = await supabaseAdmin.storage
-    .from("avatars")
-    .upload(filePath, file.buffer, {
-      contentType: file.mimetype,
-      upsert: true,
-    });
+  try {
+    // Delete old file
+    const { error: removeError } = await supabaseAdmin.storage
+      .from("avatars")
+      .remove([filePath]);
 
-  if (error) {
-    throw new Error(`Upload failed: ${error.message}`);
+    // Ignore error if file doesn't exist
+    if (removeError && !removeError.message.includes("not found")) {
+      console.warn(`Remove warning: ${removeError.message}`);
+    }
+
+    // Upload new file
+    const { data, error } = await supabaseAdmin.storage
+      .from("avatars")
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (error) {
+      throw new Error(`Upload failed: ${error.message}`);
+    }
+
+    const publicUrl = supabaseAdmin.storage
+      .from("avatars")
+      .getPublicUrl(filePath).data.publicUrl;
+
+    // save in db
+    const save = await db.uploadAvatar(requestingUserId, publicUrl);
+    return save;
+  } catch (error) {
+    throw new Error(`Avatar upload failed: ${error.message}`);
   }
-
-  const publicUrl = supabaseAdmin.storage.from("avatars").getPublicUrl(filePath)
-    .data.publicUrl;
-
-  // save in db
-  const save = await db.uploadAvatar(requestingUserId, publicUrl);
-
-  return save;
 };
 
 const deleteAvatar = async (requestingUserId) => {

@@ -97,7 +97,7 @@ async function getUserPublicData(id) {
       role: true,
     },
   });
-  console.log(user);
+
   return user;
 }
 

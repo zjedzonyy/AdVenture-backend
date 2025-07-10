@@ -7,6 +7,7 @@ const ideasValidation = require("../middlewares/ideas.validation");
 router.get("/", requireAuth, ideasController.getAllIdeas); // List all ideas (supports filters via req.query)
 router.get("/filters", requireAuth, ideasController.getFilters); // Get filters (doesn't include enums)
 router.get("/lucky", ideasController.getRandomIdea); // Get random idea
+router.get("/popular", ideasController.getPopularIdeas);
 router.get("/:id", requireAuth, ideasController.getIdea); // Get single idea, with stats and without commments and reviews
 
 // Create Idea
