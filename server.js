@@ -5,6 +5,9 @@ const prisma = require("./database/prisma");
 const PORT = process.env.PORT || 3000;
 let server;
 
+// Fixes problems with sessions on prod
+app.set("trust proxy", 1);
+
 // Graceful shutdown
 async function shutdownGracefully() {
   console.log("Shuting down server...");

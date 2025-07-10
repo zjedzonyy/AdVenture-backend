@@ -27,6 +27,9 @@ async function registerUser(req, res, next) {
 }
 
 async function loginUser(req, res) {
+  console.log("Before session save - Session ID:", req.sessionID);
+  console.log("Session store working?", req.session);
+
   res.json({
     message: "Logged in successfully",
     data: { user: req.user.username, avatarUrl: req.user.avatarUrl },

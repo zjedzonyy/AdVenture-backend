@@ -17,7 +17,7 @@
     "seed:dev": "dotenv -e .env -- node database/seed.js",
     "seed:test:high": "dotenv -e .env.test -- node database/seedHigh.js",
     "seed:dev:high": "dotenv -e .env -- node database/seedHigh.js",
-    "seed:prod:high": "dotenv -e .env.prod --node database/seedHigh.js"
+    "seed:prod:high": "dotenv -e .env.prod -- node database/seedHigh.js"
   },
   "keywords": [],
   "author": "",
