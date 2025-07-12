@@ -21,7 +21,7 @@ passport.use(
 
 // Send user.id on successfull login
 passport.serializeUser((user, done) => {
-  done(null, { id: user.id, avatarUrl: user.avatarUrl });
+  done(null, user.id);
 });
 
 // On request get id and fetch user's data from db
