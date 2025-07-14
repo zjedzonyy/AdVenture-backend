@@ -31,7 +31,7 @@ async function loginUser(req, res) {
   res.json({
     message: "Logged in successfully",
     data: {
-      user: req.user.username,
+      username: req.user.username,
       avatarUrl: req.user.avatarUrl,
       id: req.user.id,
     },
