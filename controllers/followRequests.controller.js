@@ -25,12 +25,10 @@ const sendFollowRequest = async (req, res, next) => {
 const cancelFollowRequest = async (req, res, next) => {
   try {
     const requestingUserId = req.user.id;
-    const requestId = Number(req.params.requestId);
+    const toUserId = req.params.userId;
 
-    await followRequestsService.cancelFollowRequest(
-      requestingUserId,
-      requestId,
-    );
+    console.log(requestingUserId, toUserId);
+    await followRequestsService.cancelFollowRequest(requestingUserId, toUserId);
 
     res.status(200).json({
       success: true,

@@ -341,9 +341,54 @@ async function createComment(userId, ideaId, description) {
       ideaId,
       description,
     },
+    select: {
+      id: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          likedComment: true,
+        },
+      },
+      author: {
+        select: {
+          username: true,
+          avatarUrl: true,
+          createdAt: true,
+          reviews: {
+            where: {
+              ideaId: ideaId,
+            },
+            select: {
+              rating: true,
+            },
+          },
+          _count: {
+            select: {
+              follower: true,
+              following: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  return comment;
+  return {
+    ...comment,
+    commentLikes: comment._count.likedComment,
+    author: {
+      ...comment.author,
+      followerCount: comment.author._count.follower,
+      followingCount: comment.author._count.following,
+      userIdeaRating: comment.author.reviews[0]?.rating,
+
+      _count: undefined,
+      reviews: undefined,
+    },
+    _count: undefined,
+  };
 }
 
 async function updateComment(userId, commentId, description) {
@@ -376,7 +421,13 @@ async function likeComment(commentId, requestingUserId) {
     },
   });
 
-  return like;
+  const likesCount = await prisma.likedComments.count({
+    where: {
+      commentId: commentId,
+    },
+  });
+
+  return { ...like, likesCount };
 }
 
 async function unlikeComment(commentId, requestingUserId) {
@@ -389,7 +440,13 @@ async function unlikeComment(commentId, requestingUserId) {
     },
   });
 
-  return like;
+  const likesCount = await prisma.likedComments.count({
+    where: {
+      commentId: commentId,
+    },
+  });
+
+  return { ...like, likesCount };
 }
 
 async function checkIfCommentIsLiked(commentId, requestingUserId) {

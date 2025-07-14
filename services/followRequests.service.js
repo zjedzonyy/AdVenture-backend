@@ -46,8 +46,8 @@ const sendFollowRequest = async (requestingUserId, targetId) => {
   return sendFollowRequest;
 };
 
-const cancelFollowRequest = async (requestingUserId, requestId) => {
-  const existingRequest = await db.getFollowRequestById(requestId);
+const cancelFollowRequest = async (requestingUserId, toUserId) => {
+  const existingRequest = await db.getFollowRequest(requestingUserId, toUserId);
 
   if (!existingRequest) {
     throw new BadRequestError("Follow request not found");
@@ -61,6 +61,7 @@ const cancelFollowRequest = async (requestingUserId, requestId) => {
     throw new BadRequestError("Can only cancel pending requests");
   }
 
+  const requestId = existingRequest.id;
   await db.deleteFollowRequest(requestId);
 };
 

@@ -13,7 +13,7 @@ router.post(
 
 // Cancel sent request
 router.delete(
-  "/sent/:requestId",
+  "/sent/:userId",
   requireAuth,
   followRequestsController.cancelFollowRequest,
 );
