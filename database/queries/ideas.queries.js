@@ -19,12 +19,30 @@ async function getAllIdeas(where, orderBy, skip, limit) {
 
   const totalCount = await prisma.idea.count({ where });
 
+  // Get average rating for each idea
+  const averageRatings = await prisma.review.groupBy({
+    by: ["ideaId"],
+    _avg: {
+      rating: true,
+    },
+    where: {
+      ideaId: {
+        in: ideas.map((idea) => idea.id),
+      },
+    },
+  });
+
   return [
     ideas.map((idea) => ({
       ...idea,
       authorId: idea.author.id,
       authorUsername: idea.author.username,
       authorAvatarUrl: idea.author.avatarUrl,
+      averageRating:
+        Math.round(
+          averageRatings.find((r) => r.ideaId === idea.id)?._avg.rating * 100 ||
+            0 * 100,
+        ) / 100,
       author: undefined,
     })),
     totalCount,
@@ -52,7 +70,6 @@ async function getIdea(ideaId, requestingUserId = null) {
       updatedAt: true,
       isActive: true,
       viewCount: true,
-      averageRating: true,
       completionCount: true,
       isChallenge: true,
       duration: {
@@ -112,13 +129,18 @@ async function getIdea(ideaId, requestingUserId = null) {
 
   if (!idea) return null;
 
+  const averageRating = await prisma.review.aggregate({
+    _avg: { rating: true },
+    where: { ideaId: idea.id },
+  });
+
   return {
     ...idea,
     categories: idea.categoryLinks.map((link) => link.category),
     groupSizes: idea.groupSizeLinks.map((link) => link.groupSize),
     stats: {
       viewCount: idea.viewCount,
-      averageRating: idea.averageRating,
+      averageRating: averageRating._avg.rating || 0,
       completionCount: idea.completionCount,
       commentsCount: idea._count.comments,
       reviewsCount: idea._count.reviews,
@@ -129,6 +151,15 @@ async function getIdea(ideaId, requestingUserId = null) {
     _count: undefined,
     status: undefined,
   };
+}
+
+async function getAverageRating(ideaId) {
+  const averageRating = await prisma.review.aggregate({
+    _avg: { rating: true },
+    where: { ideaId: ideaId },
+  });
+
+  return averageRating._avg.rating;
 }
 
 // If to slow -> add Index on comments.ideaId
@@ -601,4 +632,5 @@ module.exports = {
   getReview,
   getFilters,
   getPopularIdeas,
+  getAverageRating,
 };

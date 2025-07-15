@@ -8,6 +8,7 @@ const unfollowUser = async (req, res, next) => {
     const targetId = req.params.id;
 
     await followsService.unfollowUser(requestingUserId, targetId);
+
     res.status(200).json({
       success: true,
       message: `You have unfollowed user`,
@@ -73,4 +74,27 @@ const getFollowings = async (req, res, next) => {
   }
 };
 
-module.exports = { unfollowUser, removeFollower, getFollowers, getFollowings };
+const isFollowing = async (req, res, next) => {
+  try {
+    const requestingUserId = req.user.id;
+    const targetId = req.params.targetId;
+
+    const isFollowing = await db.getUserFollowing(requestingUserId, targetId);
+    const response = isFollowing ? true : false;
+
+    res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  unfollowUser,
+  removeFollower,
+  getFollowers,
+  getFollowings,
+  isFollowing,
+};

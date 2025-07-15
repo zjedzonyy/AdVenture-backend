@@ -50,5 +50,12 @@ router.post(
   ideasController.createReview,
 );
 
+// Get Ideas average rating
+router.get(
+  "/:ideaId/average-rating",
+  requireAuth,
+  ideasController.getAverageRating,
+);
+
 // Dodaj zmień Idea status:
 module.exports = router;

@@ -37,6 +37,20 @@ const getIdea = async (req, res, next) => {
   }
 };
 
+const getAverageRating = async (req, res, next) => {
+  try {
+    const ideaId = Number(req.params.ideaId);
+    const averageRating = await db.getAverageRating(ideaId);
+
+    res.status(200).json({
+      success: true,
+      data: averageRating,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getRandomIdea = async (req, res, next) => {
   try {
     const randomIdea = await ideasService.getRandomIdea();
@@ -216,14 +230,14 @@ const createReview = async (req, res, next) => {
   try {
     const ideaId = Number(req.params.ideaId);
     const requestingUserId = req.user.id;
-    const rating = req.body.rating;
+    const rating = Number(req.body.rating);
 
     const review = await ideasService.createReview(
       requestingUserId,
       rating,
       ideaId,
     );
-
+    console.log("review", review);
     res.status(200).json({
       success: true,
       message: `Rated idea`,
@@ -288,4 +302,5 @@ module.exports = {
   getReview,
   getFilters,
   getPopularIdeas,
+  getAverageRating,
 };

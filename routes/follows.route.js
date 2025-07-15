@@ -15,4 +15,11 @@ router.get("/:userId/followers", requireAuth, followsController.getFollowers);
 // Get followings
 router.get("/:userId/followings", requireAuth, followsController.getFollowings);
 
+//  Check if user is following another user
+router.get(
+  "/is-following/:targetId",
+  requireAuth,
+  followsController.isFollowing,
+);
+
 module.exports = router;

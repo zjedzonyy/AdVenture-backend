@@ -435,6 +435,23 @@ async function unfollowUser(requestingUserId, targetId) {
       },
     },
   });
+
+  // Destroy follow request if exists
+  const existingRequest = await prisma.followRequest.findUnique({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: requestingUserId,
+        toUserId: targetId,
+      },
+    },
+  });
+  if (existingRequest) {
+    await prisma.followRequest.delete({
+      where: {
+        id: existingRequest.id,
+      },
+    });
+  }
 }
 
 async function getUsersFollowRequests(requestingUserId) {
@@ -450,6 +467,7 @@ async function getUsersFollowRequests(requestingUserId) {
       createdAt: true,
       fromUser: {
         select: {
+          avatarUrl: true,
           username: true,
         },
       },
@@ -459,6 +477,7 @@ async function getUsersFollowRequests(requestingUserId) {
   return res.map((item) => ({
     ...item,
     fromUsername: item.fromUser.username,
+    avatarUrl: item.fromUser.avatarUrl,
     fromUser: undefined,
   }));
 }
@@ -476,6 +495,7 @@ async function getUsersSentFollowRequests(requestingUserId) {
       createdAt: true,
       toUser: {
         select: {
+          avatarUrl: true,
           username: true,
         },
       },
@@ -485,6 +505,7 @@ async function getUsersSentFollowRequests(requestingUserId) {
   return res.map((item) => ({
     ...item,
     toUsername: item.toUser.username,
+    avatarUrl: item.toUser.avatarUrl,
     toUser: undefined,
   }));
 }
@@ -510,6 +531,22 @@ async function removeFollower(requestingUserId, targetId) {
       },
     },
   });
+  // Destroy follow request if exists
+  const existingRequest = await prisma.followRequest.findUnique({
+    where: {
+      fromUserId_toUserId: {
+        fromUserId: targetId,
+        toUserId: requestingUserId,
+      },
+    },
+  });
+  if (existingRequest) {
+    await prisma.followRequest.delete({
+      where: {
+        id: existingRequest.id,
+      },
+    });
+  }
 }
 
 async function getUsers(username) {
@@ -561,6 +598,7 @@ async function getUserFollowers(targetId) {
       follower: {
         select: {
           username: true,
+          avatarUrl: true,
         },
       },
     },
@@ -569,6 +607,7 @@ async function getUserFollowers(targetId) {
   return users.map((user) => ({
     ...user,
     followerUsername: user.follower.username,
+    avatarUrl: user.follower.avatarUrl,
     follower: undefined,
   }));
 }
@@ -585,6 +624,7 @@ async function getUserFollowings(targetId) {
       following: {
         select: {
           username: true,
+          avatarUrl: true,
         },
       },
     },
@@ -593,6 +633,7 @@ async function getUserFollowings(targetId) {
   return users.map((user) => ({
     ...user,
     followingUsername: user.following.username,
+    avatarUrl: user.following.avatarUrl,
     following: undefined,
   }));
 }
