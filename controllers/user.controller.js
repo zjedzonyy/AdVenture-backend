@@ -90,11 +90,12 @@ const uploadAvatar = async (req, res, next) => {
     if (!file) {
       throw new BadRequestError("Must include file");
     }
-    await userService.uploadAvatar(requestingUserId, file);
+    const url = await userService.uploadAvatar(requestingUserId, file);
 
     res.status(200).json({
       success: true,
       message: `Avatar uploaded`,
+      data: url,
     });
   } catch (error) {
     next(error);

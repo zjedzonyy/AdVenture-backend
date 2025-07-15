@@ -91,8 +91,8 @@ const uploadAvatar = async (requestingUserId, file) => {
       .getPublicUrl(filePath).data.publicUrl;
 
     // save in db
-    const save = await db.uploadAvatar(requestingUserId, publicUrl);
-    return save;
+    await db.uploadAvatar(requestingUserId, publicUrl);
+    return publicUrl;
   } catch (error) {
     throw new Error(`Avatar upload failed: ${error.message}`);
   }
