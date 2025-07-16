@@ -1,11 +1,5 @@
 const db = require("../database/queries/index");
-const {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-  NotFoundError,
-  ForbiddenError,
-} = require("../utils/error.utils");
+const { BadRequestError, ForbiddenError } = require("../utils/error.utils");
 
 const unfollowUser = async (requestingUserId, targetId) => {
   const userFollow = await db.getUserFollowing(requestingUserId, targetId);

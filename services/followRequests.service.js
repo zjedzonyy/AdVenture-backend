@@ -1,10 +1,5 @@
 const db = require("../database/queries/index");
-const {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-  NotFoundError,
-} = require("../utils/error.utils");
+const { BadRequestError } = require("../utils/error.utils");
 
 // Check if:
 // -user sent follow to herself

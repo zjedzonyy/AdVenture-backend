@@ -3,11 +3,9 @@ const bcrypt = require("bcryptjs");
 const {
   BadRequestError,
   ConflictError,
-  UnauthorizedError,
   NotFoundError,
 } = require("../utils/error.utils");
 const supabaseAdmin = require("../database/supabase/supabase");
-const { request } = require("express");
 
 const register = async ({ username, password, email }) => {
   if (!username || !password || !email) {
@@ -75,6 +73,7 @@ const uploadAvatar = async (requestingUserId, file) => {
     }
 
     // Upload new file
+    // eslint-disable-next-line no-unused-vars
     const { data, error } = await supabaseAdmin.storage
       .from("avatars")
       .upload(filePath, file.buffer, {
@@ -101,6 +100,7 @@ const uploadAvatar = async (requestingUserId, file) => {
 const deleteAvatar = async (requestingUserId) => {
   const fileName = `${requestingUserId}-avatar`;
   const filePath = `avatars/${requestingUserId}/${fileName}`;
+  // eslint-disable-next-line no-unused-vars
   const { data, error } = await supabaseAdmin.storage
     .from("avatars")
     .remove([filePath]);

@@ -1,30 +1,8 @@
 const db = require("../database/queries/index");
-const bcrypt = require("bcryptjs");
-const {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-  NotFoundError,
-} = require("../utils/error.utils");
+const { BadRequestError, NotFoundError } = require("../utils/error.utils");
 const prisma = require("../database/prisma");
 const viewsCache = require("../utils/views.cache");
-
-// Returns prisma orderBy based on query param sort=newest / oldest / popular...
-// Returns { createdAt: "desc" } if couldn't find any match
-const buildOrderByClause = (sortBy) => {
-  const validSorts = {
-    newest: { createdAt: "desc" },
-    oldest: { createdAt: "asc" },
-    popular: { viewCount: "desc" },
-    least_popular: { viewCount: "asc" },
-    rating: { averageRating: "desc" },
-    least_rating: { averageRating: "asc" },
-    completed: { completionCount: "desc" },
-    least_completed: { completionCount: "asc" },
-  };
-
-  return validSorts[sortBy] || validSorts.newest;
-};
+const { buildOrderByClause } = require("../utils/orderByBuilder");
 
 const getAllIdeas = async (filters, requestingUserId) => {
   // Arguments to filter with prisma ORM
@@ -103,7 +81,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
     };
   }
 
-  if (filters.updated_beofore) {
+  if (filters.updated_before) {
     where.updatedAt = {
       ...where.updatedAt,
       lte: new Date(filters.updated_beofore),
@@ -112,7 +90,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
 
   // Expect String "true" or "false"
   if (filters.active) {
-    where.isActive = Boolean(filters.active);
+    where.isActive = filters.active === "true";
   }
 
   // Every number expect to be delivered as String in query params
@@ -174,7 +152,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
   }
 
   if (filters.challenge) {
-    where.isChallenge = Boolean(filters.challenge);
+    where.isChallenge = filters.challenge === "true";
   }
 
   // Expect duration.id to point to the associated label
@@ -190,6 +168,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
     where.durationId = Number(filters.duration);
   }
 
+  if (!where.OR) where.OR = [];
   // Expect string with comma seperator (e.g /ideas?categoryIds=1,2,3)
   // Expect category.id to refer to the associated label
   // 1 - "Sport" ; 2 - "Music" ; etc.
@@ -202,13 +181,15 @@ const getAllIdeas = async (filters, requestingUserId) => {
           ? filters.categoryIds.map(Number)
           : [Number(filters.categoryIds)];
 
-    where.OR = idsArray.map((id) => ({
-      categoryLinks: {
-        some: {
-          categoryId: id,
+    where.OR.push(
+      idsArray.map((id) => ({
+        categoryLinks: {
+          some: {
+            categoryId: id,
+          },
         },
-      },
-    }));
+      })),
+    );
   }
 
   // Based on table: group_size
@@ -221,13 +202,15 @@ const getAllIdeas = async (filters, requestingUserId) => {
           ? filters.groupIds.map(Number)
           : [Number(filters.groupIds)];
 
-    where.OR = idsArray.map((id) => ({
-      groupSizeLinks: {
-        some: {
-          groupSizeId: Number(id),
+    where.OR.push(
+      idsArray.map((id) => ({
+        groupSizeLinks: {
+          some: {
+            groupSizeId: Number(id),
+          },
         },
-      },
-    }));
+      })),
+    );
   }
 
   // Based on table: price_range
@@ -364,11 +347,7 @@ const createIdea = async (
 const isAuthor = async (ideaId, userId) => {
   const idea = await db.getIdea(ideaId);
 
-  if (idea.author.id === userId) {
-    return true;
-  } else {
-    return false;
-  }
+  return idea.author.id === userId;
 };
 
 const changeStatus = async (ideaId, requestingUserId, ideaStatus) => {

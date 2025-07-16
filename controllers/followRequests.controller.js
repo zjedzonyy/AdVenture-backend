@@ -1,6 +1,4 @@
 const followRequestsService = require("../services/followRequests.service");
-const db = require("../database/queries/index");
-const { BadRequestError } = require("../utils/error.utils");
 
 const sendFollowRequest = async (req, res, next) => {
   try {
@@ -27,7 +25,6 @@ const cancelFollowRequest = async (req, res, next) => {
     const requestingUserId = req.user.id;
     const toUserId = req.params.userId;
 
-    console.log(requestingUserId, toUserId);
     await followRequestsService.cancelFollowRequest(requestingUserId, toUserId);
 
     res.status(200).json({

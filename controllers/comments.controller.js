@@ -1,5 +1,4 @@
 const commentsService = require("../services/comments.service");
-const { BadRequestError, UnauthorizedError } = require("../utils/error.utils");
 const db = require("../database/queries/index");
 
 const createComment = async (req, res, next) => {

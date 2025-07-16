@@ -237,7 +237,6 @@ const createReview = async (req, res, next) => {
       rating,
       ideaId,
     );
-    console.log("review", review);
     res.status(200).json({
       success: true,
       message: `Rated idea`,

@@ -1,6 +1,5 @@
 const followsService = require("../services/follows.service");
 const db = require("../database/queries/index");
-const { BadRequestError } = require("../utils/error.utils");
 
 const unfollowUser = async (req, res, next) => {
   try {
@@ -14,7 +13,6 @@ const unfollowUser = async (req, res, next) => {
       message: `You have unfollowed user`,
     });
   } catch (error) {
-    console.error(error);
     next(error);
   }
 };

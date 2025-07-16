@@ -1,5 +1,3 @@
-// const bcrypt = require("bcryptjs");
-// const db = require("../database/queries");
 const userService = require("../services/user.service");
 
 async function registerUser(req, res, next) {
@@ -17,6 +15,7 @@ async function registerUser(req, res, next) {
       });
     } else {
       res.status(201).json({
+        success: true,
         message: "User registered and logged in successfully!",
         user: newUser.username,
       });
@@ -27,7 +26,6 @@ async function registerUser(req, res, next) {
 }
 
 async function loginUser(req, res) {
-  console.log(req.user);
   res.json({
     message: "Logged in successfully",
     data: {

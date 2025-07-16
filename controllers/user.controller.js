@@ -1,4 +1,3 @@
-// controllers/user.controllers.js
 const userService = require("../services/user.service");
 const db = require("../database/queries/index");
 const { BadRequestError } = require("../utils/error.utils");
