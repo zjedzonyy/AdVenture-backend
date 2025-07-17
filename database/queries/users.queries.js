@@ -291,9 +291,6 @@ async function getUsers(username) {
       createdAt: true,
       profileViewCount: true,
       avatarUrl: true,
-      ideas: true,
-      comments: true,
-      ideaStatus: true,
       role: true,
       _count: {
         select: {

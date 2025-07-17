@@ -168,7 +168,6 @@ const getAllIdeas = async (filters, requestingUserId) => {
     where.durationId = Number(filters.duration);
   }
 
-  if (!where.OR) where.OR = [];
   // Expect string with comma seperator (e.g /ideas?categoryIds=1,2,3)
   // Expect category.id to refer to the associated label
   // 1 - "Sport" ; 2 - "Music" ; etc.
@@ -181,15 +180,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
           ? filters.categoryIds.map(Number)
           : [Number(filters.categoryIds)];
 
-    where.OR.push(
-      idsArray.map((id) => ({
-        categoryLinks: {
-          some: {
-            categoryId: id,
-          },
-        },
-      })),
-    );
+    where.categoryLinks = { some: { categoryId: { in: idsArray } } };
   }
 
   // Based on table: group_size
@@ -202,15 +193,7 @@ const getAllIdeas = async (filters, requestingUserId) => {
           ? filters.groupIds.map(Number)
           : [Number(filters.groupIds)];
 
-    where.OR.push(
-      idsArray.map((id) => ({
-        groupSizeLinks: {
-          some: {
-            groupSizeId: Number(id),
-          },
-        },
-      })),
-    );
+    where.groupSizeLinks = { some: { groupSizeId: { in: idsArray } } };
   }
 
   // Based on table: price_range

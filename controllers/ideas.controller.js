@@ -6,6 +6,7 @@ const getAllIdeas = async (req, res, next) => {
   try {
     const filters = req.query;
     const requestingUserId = req.user.id;
+
     const ideas = await ideasService.getAllIdeas(filters, requestingUserId);
 
     res.status(200).json({

@@ -5,14 +5,8 @@ const pgSession = require("connect-pg-simple")(session);
 const passport = require("passport");
 const morgan = require("morgan");
 const { Pool } = require("pg");
-
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-} = require("./utils/error.utils.js");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger/swagger.config.js");
 
 require("dotenv-flow").config();
 require("./config/passport.config.js");
@@ -36,6 +30,8 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 // Allows reading JSON from requests
 app.use(express.json());
+// Swagger documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Logging middleware
 if (process.env.NODE_ENV !== "test") {

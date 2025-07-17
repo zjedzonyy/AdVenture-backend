@@ -11,6 +11,29 @@ router.post(
   authController.registerUser,
 );
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login (demo credentials below)
+ *     description: |
+ *       Use demo credentials:
+ *       - username: TestUser2
+ *       - password: Password1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: TestUser2
+ *               password:
+ *                 type: string
+ *                 example: Password1
+ */
 router.post(
   "/login",
   userValidation.validateUserLogin,
