@@ -30,7 +30,7 @@ const getFollowers = async (requestingUserId, targetId) => {
   if (isFollowing) {
     return await db.getUserFollowers(targetId);
   } else {
-    throw new ForbiddenError("You must follower the User to see her details");
+    throw new ForbiddenError("You must follow the User to see her details");
   }
 };
 

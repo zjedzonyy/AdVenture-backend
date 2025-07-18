@@ -20,6 +20,8 @@ router.post(
  *       Use demo credentials:
  *       - username: TestUser2
  *       - password: Password1
+ *     tags:
+ *      - Auth
  *     requestBody:
  *       required: true
  *       content:

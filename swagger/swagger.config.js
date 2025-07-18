@@ -6,7 +6,8 @@ const options = {
     info: {
       title: "AdVenture API",
       version: "1.0.0",
-      description: "API documentation",
+      description:
+        "This is a simplified API documentation for the AdVenture project. Only selected endpoints are included for demonstration and testing purposes. Authentication is required for all routes — please log in using the provided example credentials.",
     },
     components: {
       securitySchemes: {

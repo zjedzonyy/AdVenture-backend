@@ -29,7 +29,7 @@ const updateComment = async (req, res, next) => {
     const description = req.body.description;
     const commentId = Number(req.params.commentId);
 
-    const comment = await db.updateComment(
+    const comment = await commentsService.updateComment(
       requestingUserId,
       commentId,
       description,
@@ -89,7 +89,7 @@ const likeComment = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Comment liked",
+      message: "Comment liked/unliked",
       data: like,
     });
   } catch (error) {

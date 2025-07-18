@@ -1,5 +1,9 @@
 const db = require("../database/queries/index");
-const { NotFoundError, BadRequestError } = require("../utils/error.utils");
+const {
+  NotFoundError,
+  BadRequestError,
+  ForbiddenError,
+} = require("../utils/error.utils");
 
 const getComments = async (ideaId, filters) => {
   const page = Math.max(1, parseInt(filters.page || 1));
@@ -38,6 +42,24 @@ const getComments = async (ideaId, filters) => {
       hasPreviousPage: page > 1,
     },
   };
+};
+
+const updateComment = async (requestingUserId, commentId, description) => {
+  const comment = await db.getComment(commentId);
+  if (!comment) {
+    throw new BadRequestError("Comment not found");
+  }
+  if (comment.authorId !== requestingUserId) {
+    throw new BadRequestError(
+      "You must be the author of the comment to update it",
+    );
+  }
+  const updatedComment = await db.updateComment(
+    requestingUserId,
+    commentId,
+    description,
+  );
+  return updatedComment;
 };
 
 const likeComment = async (commentId, requestingUserId) => {
@@ -82,7 +104,7 @@ const deleteComment = async (commentId, requestingUserId) => {
 
   //   CHANGE FOR MIDDLEWARE THAT ASKS FOR REQUIRED PERMISSION AS PARAMETERS
   if (comment.authorId !== requestingUserId && user.role !== "ADMIN") {
-    throw new BadRequestError("You must be admin or author of the comment");
+    throw new ForbiddenError("You must be admin or author of the comment");
   }
 
   const remove = await db.deleteComment(commentId, requestingUserId);
@@ -90,4 +112,10 @@ const deleteComment = async (commentId, requestingUserId) => {
   return remove;
 };
 
-module.exports = { getComments, likeComment, unlikeComment, deleteComment };
+module.exports = {
+  getComments,
+  likeComment,
+  unlikeComment,
+  deleteComment,
+  updateComment,
+};

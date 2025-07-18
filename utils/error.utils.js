@@ -53,4 +53,5 @@ module.exports = {
   ForbiddenError,
   NotFoundError,
   ConflictError,
+  AuthenticateError,
 };
