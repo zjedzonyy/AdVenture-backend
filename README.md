@@ -110,7 +110,9 @@ backend/
 ```
 
 ## 📚 API Documentation
-- **Swagger UI:** [API-DOCS](https://strong-learning-production-8e89.up.railway.app/api-docs/) 
+- **Swagger UI:** [API-DOCS](https://strong-learning-production-8e89.up.railway.app/api-docs/)
+
+Be patient, it just needs a moment to wake up :>
 ---
 
   
